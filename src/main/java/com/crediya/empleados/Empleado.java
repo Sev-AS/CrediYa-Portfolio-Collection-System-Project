@@ -1,7 +1,7 @@
 package com.crediya.empleados;
 
 public class Empleado {
-        private int id;
+    private int id;
     private String nombre;
     private int documento;
     private String rol;
