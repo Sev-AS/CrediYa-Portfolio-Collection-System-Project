@@ -9,52 +9,60 @@ public class MenuClientes {
     Scanner consola = new Scanner(System.in);
     GestorClientes gestorClientes = new GestorClientes();
 
-    public MenuClientes (){   // ← Constructor corregido
+
+    public MenuClientes (){   
         gestorClientes.cargarClientes();
+        IniciarMenu();
+    }
+
+    private void IniciarMenu(){
         do {
 
-        System.out.println(
-                """
-        ▄▄▄▄▄▄▄ ▄▄                                   
-        ███▀▀▀▀▀ ██ ▀▀               ██               
-        ███      ██ ██  ▄█▀█▄ ████▄ ▀██▀▀ ▄█▀█▄ ▄█▀▀▀ 
-        ███      ██ ██  ██▄█▀ ██ ██  ██   ██▄█▀ ▀███▄ 
-        ▀███████ ██ ██▄ ▀█▄▄▄ ██ ██  ██   ▀█▄▄▄ ▄▄▄█▀ 
-
-            -- 1 -- Inscribir un cliente       
-            -- 2 -- ver lista de clientes      
-            -- 3 -- Buscar cliente por nombre  
-            -- 4 -- Eliminar un cliente        
-            -- 5 -- Actualizar un cliente      
-            -- 6 -- Salir de menú de cliente   
-                """
-       );
-
-       opcion = consola.nextInt();
-
-       switch (opcion) {
-        case 1:
-            MCagregarCliente();
-            gestorClientes.guardarClientes();
-            break;
-        case 2:
-            gestorClientes.listadetodoslosCliente();
-            break;
-        case 3:
-            MCgetEspecifiCliente();
-            break;
-        case 4:
-            MCdeleteEspecifiCliente();
-            break;
-        case 5:
-            MCactualizarCliente();
-            break;
-        case 6:
-            break;
-       }
-
-      } while (opcion != 6);
+            System.out.println(
+                    """
+            ▄▄▄▄▄▄▄ ▄▄                                   
+            ███▀▀▀▀▀ ██ ▀▀               ██               
+            ███      ██ ██  ▄█▀█▄ ████▄ ▀██▀▀ ▄█▀█▄ ▄█▀▀▀ 
+            ███      ██ ██  ██▄█▀ ██ ██  ██   ██▄█▀ ▀███▄ 
+            ▀███████ ██ ██▄ ▀█▄▄▄ ██ ██  ██   ▀█▄▄▄ ▄▄▄█▀ 
+    
+                -- 1 -- Inscribir un cliente       
+                -- 2 -- ver lista de clientes      
+                -- 3 -- Buscar cliente por nombre  
+                -- 4 -- Eliminar un cliente        
+                -- 5 -- Actualizar un cliente      
+                -- 6 -- Salir de menú de cliente   
+                    """
+           );
+    
+           opcion = consola.nextInt();
+    
+           switch (opcion) {
+            case 1:
+                MCagregarCliente();
+                gestorClientes.guardarClientes();
+                break;
+            case 2:
+                gestorClientes.listadetodoslosCliente();
+                break;
+            case 3:
+                MCgetEspecifiCliente();
+                break;
+            case 4:
+                MCdeleteEspecifiCliente();
+                gestorClientes.guardarClientes();
+                break;
+            case 5:
+                MCactualizarCliente();
+                gestorClientes.guardarClientes();
+                break;
+            case 6:
+                break;
+           }
+    
+          } while (opcion != 6);
     }
+
 
     public void MCagregarCliente(){
         System.out.println("id");

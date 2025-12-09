@@ -9,6 +9,7 @@ import java.util.Scanner;
 
 public class GestorClientes {
     //Atributo list
+    @SuppressWarnings("FieldMayBeFinal")
     private List<Clientes> clientes;
 
     //Contructor el constructor crea el new Arraylist ya que toca inicializarlo
