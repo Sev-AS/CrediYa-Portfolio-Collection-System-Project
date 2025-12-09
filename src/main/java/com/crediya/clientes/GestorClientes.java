@@ -1,7 +1,10 @@
 package com.crediya.clientes;
 
+import java.io.File;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 
 public class GestorClientes {
@@ -71,6 +74,58 @@ public class GestorClientes {
         return false;
     }
 
+    //Persistencia mediante archivo txt
+
+    public void guardarClientes (){
+        try(PrintWriter escritor = new PrintWriter("clientes.txt")){
+            for (Clientes c : clientes){
+                escritor.println(
+                    c.getid() + ";" +
+                    c.getnombre() + ";" +
+                    c.getdocumento() + ";" +
+                    c.getcorreo() + ";" +
+                    c.gettelefono() 
+                );
+            }
+            System.out.println("Clientes guardados correctamente");
+        } 
+        catch (Exception e){
+            System.out.println("Error al guardar los cliente" + e.getMessage());
+        }
+    }
+
+    //Cargador de clientes
+    public void cargarClientes(){
+        clientes.clear();
+
+        File archivo = new File("clientes.txt");
+        if(!archivo.exists()) {
+            System.out.println("No existe el archivo");
+            return;
+        }
+
+        try (Scanner scaneadorArchivo = new Scanner(archivo)){
+
+            while (scaneadorArchivo.hasNextLine()) {
+                String linea = scaneadorArchivo.nextLine();
+                String[] partes = linea.split(";");
+
+                if(partes.length == 5){
+                    Clientes c = new Clientes(
+                        Integer.parseInt(partes[0]),
+                        partes[1],
+                        Integer.parseInt(partes[2]),
+                        partes[3],
+                        partes[4]
+                    );
+                    clientes.add(c);
+                }
+            }
+            System.out.println("Clientes cargados exitosamente.");
+        } catch (Exception e){
+            System.out.println("Error al cargar clientes " + e.getMessage());
+        }
+    }
 
     public static void main(String[] args) {
         GestorClientes gestorCliente = new GestorClientes();

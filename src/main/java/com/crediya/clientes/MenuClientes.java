@@ -10,7 +10,7 @@ public class MenuClientes {
     GestorClientes gestorClientes = new GestorClientes();
 
     public MenuClientes (){   // ← Constructor corregido
-
+        gestorClientes.cargarClientes();
         do {
 
         System.out.println(
@@ -35,6 +35,7 @@ public class MenuClientes {
        switch (opcion) {
         case 1:
             MCagregarCliente();
+            gestorClientes.guardarClientes();
             break;
         case 2:
             gestorClientes.listadetodoslosCliente();
