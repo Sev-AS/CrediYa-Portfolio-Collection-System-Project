@@ -32,13 +32,13 @@ public class Pagos {
     public int getPagosId(){
         return this.id;
     }
-    public int setPagosPrestamo_id(){
+    public int getPagosPrestamo_id(){
         return this.prestamo_id;
     }
-    public String setPagosFecha_pago(){
+    public String getPagosFecha_pago(){
         return this.fecha_pago;
     }
-    public double setPagosMonto(){
+    public double getPagosMonto(){
         return this.monto;
     }
     //ToString
