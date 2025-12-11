@@ -1,18 +1,11 @@
 package com.crediya.empleados;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class EmpleadoRepository {
-
-private List<Empleado> empleados = new ArrayList<>();
-
-public void agregar(Empleado empleado){
-    empleados.add(empleado);
-}
-
-public List<Empleado> listar(){
-    return empleados;
-}
-
+public interface EmpleadoRepository {
+    Empleado agregar(Empleado empleado);
+    List<Empleado> listar();
+    Empleado obtenerPorId(int id);
+    void actualizar(Empleado empleado);
+    void eliminar(int id);
 }

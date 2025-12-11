@@ -61,6 +61,10 @@ public class Empleado {
         return salario;
     }
 
+    public void setSalario(double salario) {
+        this.salario = salario;
+    }
+
     @Override
     public String toString() {
         return "Empleado [id=" + id + ", nombre=" + nombre + ", documento=" + documento + ", rol=" + rol + ", correo="
