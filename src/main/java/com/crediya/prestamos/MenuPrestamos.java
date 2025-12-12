@@ -1,15 +1,22 @@
 package com.crediya.prestamos;
 
+import com.crediya.clientes.ClienteRepository;
+import com.crediya.empleados.EmpleadoRepository;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
 public class MenuPrestamos {
     private final PrestamoRepository prestamoRepository;
+    private final ClienteRepository clienteRepository;
+    private final EmpleadoRepository empleadoRepository;
     private final Scanner consola;
 
-    public MenuPrestamos(PrestamoRepository prestamoRepository) {
+    public MenuPrestamos(PrestamoRepository prestamoRepository, ClienteRepository clienteRepository,
+            EmpleadoRepository empleadoRepository) {
         this.prestamoRepository = prestamoRepository;
+        this.clienteRepository = clienteRepository;
+        this.empleadoRepository = empleadoRepository;
         this.consola = new Scanner(System.in);
     }
 
@@ -20,20 +27,20 @@ public class MenuPrestamos {
                 System.out.println(
                         """
 
-                        ▄▄▄▄▄▄▄                                                                              
-                        ███▀▀███▄                    ██                       
-                        ███▄▄███▀ ████▄ ▄█▀█▄ ▄█▀▀▀ ▀██▀▀ ▀▀█▄ ███▄███▄ ▄███▄ 
-                        ███▀▀▀▀   ██ ▀▀ ██▄█▀ ▀███▄  ██  ▄█▀██ ██ ██ ██ ██ ██ 
-                        ███       ██    ▀█▄▄▄ ▄▄▄█▀  ██  ▀█▄██ ██ ██ ██ ▀███▀ 
-                                                                                                                      
-                        1. Registrar Nuevo Prestamo
-                        2. Ver Lista de Prestamos
-                        3. Cambiar Estado de un Prestamo
-                        4. Salir
-                        """);
+                                ▄▄▄▄▄▄▄
+                                ███▀▀███▄                    ██
+                                ███▄▄███▀ ████▄ ▄█▀█▄ ▄█▀▀▀ ▀██▀▀ ▀▀█▄ ███▄███▄ ▄███▄
+                                ███▀▀▀▀   ██ ▀▀ ██▄█▀ ▀███▄  ██  ▄█▀██ ██ ██ ██ ██ ██
+                                ███       ██    ▀█▄▄▄ ▄▄▄█▀  ██  ▀█▄██ ██ ██ ██ ▀███▀
+
+                                1. Registrar Nuevo Prestamo
+                                2. Ver Lista de Prestamos
+                                3. Cambiar Estado de un Prestamo
+                                4. Salir
+                                """);
                 System.out.print("Opcion: ");
                 opcion = consola.nextInt();
-                consola.nextLine(); 
+                consola.nextLine();
 
                 switch (opcion) {
                     case 1 -> mpAgregarPrestamo();
@@ -53,11 +60,23 @@ public class MenuPrestamos {
     private void mpAgregarPrestamo() {
         System.out.println("--- Registrar Nuevo Prestamo ---");
         try {
-            System.out.print("ID del Cliente: ");
-            int clienteId = consola.nextInt();
+            System.out.print("Documento del Cliente: ");
+            int documentoCliente = consola.nextInt();
+
+            var cliente = clienteRepository.obtenerPorDocumento(documentoCliente);
+            if (cliente == null) {
+                System.out.println("Error: El cliente con documento " + documentoCliente + " no existe.");
+                return;
+            }
+            int clienteId = cliente.getId();
 
             System.out.print("ID del Empleado: ");
             int empleadoId = consola.nextInt();
+
+            if (empleadoRepository.obtenerPorId(empleadoId) == null) {
+                System.out.println("Error: El empleado con ID " + empleadoId + " no existe.");
+                return;
+            }
 
             System.out.print("Monto del prestamo: ");
             double monto = consola.nextDouble();
@@ -67,7 +86,7 @@ public class MenuPrestamos {
 
             System.out.print("Numero de cuotas: ");
             int cuotas = consola.nextInt();
-            consola.nextLine(); 
+            consola.nextLine();
 
             System.out.print("Fecha de Inicio (ej: 2024-12-11): ");
             String fecha = consola.nextLine();
@@ -78,9 +97,13 @@ public class MenuPrestamos {
             Prestamos nuevo = new Prestamos(0, clienteId, empleadoId, monto, interes, cuotas, fecha, estado);
             Prestamos prestamoGuardado = prestamoRepository.agregar(nuevo);
 
-            System.out.println("Prestamo registrado exitosamente con ID: " + prestamoGuardado.getId());
-            System.out.println("Detalles del prestamo:");
-            System.out.println(prestamoGuardado);
+            if (prestamoGuardado != null) {
+                System.out.println("Prestamo registrado exitosamente con ID: " + prestamoGuardado.getId());
+                System.out.println("Detalles del prestamo:");
+                System.out.println(prestamoGuardado);
+            } else {
+                System.out.println("Error al guardar el prestamo.");
+            }
 
         } catch (InputMismatchException e) {
             System.out.println("Error: Uno de los valores numericos es invalido.");
@@ -103,7 +126,7 @@ public class MenuPrestamos {
         try {
             System.out.print("ID del prestamo a modificar: ");
             int id = consola.nextInt();
-            consola.nextLine(); 
+            consola.nextLine();
 
             Prestamos prestamo = prestamoRepository.obtenerPorId(id);
             if (prestamo == null) {

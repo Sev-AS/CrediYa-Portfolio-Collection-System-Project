@@ -8,27 +8,27 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import com.crediya.common.DatabaseConnection;
 
 public class ClienteRepositoryJdbc implements ClienteRepository {
 
-    private final String URL_DB = "jdbc:h2:mem:crediya;DB_CLOSE_DELAY=-1";
-    private final String USER_DB = "sa";
-    private final String PASSWORD_DB = "";
+    private final DatabaseConnection dbConnection;
 
-    public ClienteRepositoryJdbc() {
+    public ClienteRepositoryJdbc(DatabaseConnection dbConnection) {
+        this.dbConnection = dbConnection;
         inicializarEsquema();
     }
 
     private void inicializarEsquema() {
         try (Connection conn = getConnection();
-             Statement stmt = conn.createStatement()) {
+                Statement stmt = conn.createStatement()) {
 
             String sql = "CREATE TABLE IF NOT EXISTS clientes (" +
-                         "id INT AUTO_INCREMENT PRIMARY KEY, " +
-                         "nombre VARCHAR(255) NOT NULL, " +
-                         "documento INT NOT NULL UNIQUE, " +
-                         "correo VARCHAR(255), " +
-                         "telefono VARCHAR(255))";
+                    "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "nombre VARCHAR(255) NOT NULL, " +
+                    "documento INT NOT NULL UNIQUE, " +
+                    "correo VARCHAR(255), " +
+                    "telefono VARCHAR(255))";
             stmt.executeUpdate(sql);
 
         } catch (SQLException e) {
@@ -37,14 +37,14 @@ public class ClienteRepositoryJdbc implements ClienteRepository {
     }
 
     private Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL_DB, USER_DB, PASSWORD_DB);
+        return dbConnection.getConnection();
     }
 
     @Override
     public Cliente agregar(Cliente cliente) {
         String sql = "INSERT INTO clientes(nombre, documento, correo, telefono) VALUES(?, ?, ?, ?)";
         try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setString(1, cliente.getNombre());
             pstmt.setInt(2, cliente.getDocumento());
@@ -72,8 +72,8 @@ public class ClienteRepositoryJdbc implements ClienteRepository {
         List<Cliente> clientes = new ArrayList<>();
         String sql = "SELECT * FROM clientes";
         try (Connection conn = getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
                 clientes.add(mapRowToCliente(rs));
@@ -88,7 +88,7 @@ public class ClienteRepositoryJdbc implements ClienteRepository {
     public Cliente obtenerPorDocumento(int documento) {
         String sql = "SELECT * FROM clientes WHERE documento = ?";
         try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, documento);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -105,7 +105,7 @@ public class ClienteRepositoryJdbc implements ClienteRepository {
     public void actualizar(Cliente cliente) {
         String sql = "UPDATE clientes SET nombre = ?, correo = ?, telefono = ? WHERE documento = ?";
         try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, cliente.getNombre());
             pstmt.setString(2, cliente.getCorreo());
             pstmt.setString(3, cliente.getTelefono());
@@ -120,7 +120,7 @@ public class ClienteRepositoryJdbc implements ClienteRepository {
     public void eliminar(int documento) {
         String sql = "DELETE FROM clientes WHERE documento = ?";
         try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, documento);
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -134,7 +134,6 @@ public class ClienteRepositoryJdbc implements ClienteRepository {
                 rs.getString("nombre"),
                 rs.getInt("documento"),
                 rs.getString("correo"),
-                rs.getString("telefono")
-        );
+                rs.getString("telefono"));
     }
 }

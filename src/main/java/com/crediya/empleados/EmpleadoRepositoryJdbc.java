@@ -8,28 +8,28 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import com.crediya.common.DatabaseConnection;
 
 public class EmpleadoRepositoryJdbc implements EmpleadoRepository {
 
-    private final String USER_DB = "root";
-    private final String URL_DB = "jdbc:mysql://localhost:3306/crediya_db";
-    private final String PASSWORD_DB = "admin";
+    private final DatabaseConnection dbConnection;
 
-    public EmpleadoRepositoryJdbc() {
+    public EmpleadoRepositoryJdbc(DatabaseConnection dbConnection) {
+        this.dbConnection = dbConnection;
         inicializarEsquema();
     }
 
     private void inicializarEsquema() {
         try (Connection conn = getConnection();
-             Statement stmt = conn.createStatement()) {
+                Statement stmt = conn.createStatement()) {
 
             String sql = "CREATE TABLE IF NOT EXISTS empleados (" +
-                         "id INT AUTO_INCREMENT PRIMARY KEY, " +
-                         "nombre VARCHAR(255) NOT NULL, " +
-                         "documento INT NOT NULL, " +
-                         "rol VARCHAR(255), " +
-                         "correo VARCHAR(255), " +
-                         "salario DOUBLE)";
+                    "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                    "nombre VARCHAR(255) NOT NULL, " +
+                    "documento INT NOT NULL, " +
+                    "rol VARCHAR(255), " +
+                    "correo VARCHAR(255), " +
+                    "salario DOUBLE)";
             stmt.executeUpdate(sql);
 
         } catch (SQLException e) {
@@ -38,14 +38,14 @@ public class EmpleadoRepositoryJdbc implements EmpleadoRepository {
     }
 
     private Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL_DB, USER_DB, PASSWORD_DB);
+        return dbConnection.getConnection();
     }
 
     @Override
     public Empleado agregar(Empleado empleado) {
         String sql = "INSERT INTO empleados(nombre, documento, rol, correo, salario) VALUES(?, ?, ?, ?, ?)";
         try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setString(1, empleado.getNombre());
             pstmt.setInt(2, empleado.getDocumento());
@@ -65,7 +65,7 @@ public class EmpleadoRepositoryJdbc implements EmpleadoRepository {
             return empleado;
         } catch (SQLException e) {
             System.err.println("Error al agregar empleado: " + e.getMessage());
-            return null; 
+            return null;
         }
     }
 
@@ -74,8 +74,8 @@ public class EmpleadoRepositoryJdbc implements EmpleadoRepository {
         List<Empleado> empleados = new ArrayList<>();
         String sql = "SELECT * FROM empleados";
         try (Connection conn = getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
                 empleados.add(mapRowToEmpleado(rs));
@@ -90,7 +90,7 @@ public class EmpleadoRepositoryJdbc implements EmpleadoRepository {
     public Empleado obtenerPorId(int id) {
         String sql = "SELECT * FROM empleados WHERE id = ?";
         try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -107,7 +107,7 @@ public class EmpleadoRepositoryJdbc implements EmpleadoRepository {
     public void actualizar(Empleado empleado) {
         String sql = "UPDATE empleados SET nombre = ?, documento = ?, rol = ?, correo = ?, salario = ? WHERE id = ?";
         try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, empleado.getNombre());
             pstmt.setInt(2, empleado.getDocumento());
             pstmt.setString(3, empleado.getRol());
@@ -124,7 +124,7 @@ public class EmpleadoRepositoryJdbc implements EmpleadoRepository {
     public void eliminar(int id) {
         String sql = "DELETE FROM empleados WHERE id = ?";
         try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -139,7 +139,6 @@ public class EmpleadoRepositoryJdbc implements EmpleadoRepository {
                 rs.getInt("documento"),
                 rs.getString("rol"),
                 rs.getString("correo"),
-                rs.getDouble("salario")
-        );
+                rs.getDouble("salario"));
     }
 }
