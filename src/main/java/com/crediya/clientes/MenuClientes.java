@@ -1,141 +1,164 @@
 package com.crediya.clientes;
 
+import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
-
-
 public class MenuClientes {
-    private int opcion;
-    Scanner consola = new Scanner(System.in);
-    GestorClientes gestorClientes = new GestorClientes();
+    private final ClienteRepository clienteRepository;
+    private final Scanner consola;
 
-
-    public MenuClientes (){   
-        gestorClientes.cargarClientes();
-        IniciarMenu();
+    public MenuClientes(ClienteRepository clienteRepository) {
+        this.clienteRepository = clienteRepository;
+        this.consola = new Scanner(System.in);
     }
 
-    private void IniciarMenu(){
+    public void iniciarMenu() {
+        int opcion = 0;
         do {
+            try {
+                System.out.println(
+                        """
 
-            System.out.println(
-                    """
-            ▄▄▄▄▄▄▄ ▄▄                                   
-            ███▀▀▀▀▀ ██ ▀▀               ██               
-            ███      ██ ██  ▄█▀█▄ ████▄ ▀██▀▀ ▄█▀█▄ ▄█▀▀▀ 
-            ███      ██ ██  ██▄█▀ ██ ██  ██   ██▄█▀ ▀███▄ 
-            ▀███████ ██ ██▄ ▀█▄▄▄ ██ ██  ██   ▀█▄▄▄ ▄▄▄█▀ 
-    
-                -- 1 -- Inscribir un cliente       
-                -- 2 -- ver lista de clientes      
-                -- 3 -- Buscar cliente por nombre  
-                -- 4 -- Eliminar un cliente        
-                -- 5 -- Actualizar un cliente      
-                -- 6 -- Salir de menú de cliente   
-                    """
-           );
-    
-           opcion = consola.nextInt();
-    
-           switch (opcion) {
-            case 1:
-                MCagregarCliente();
-                gestorClientes.guardarClientes();
-                break;
-            case 2:
-                gestorClientes.listadetodoslosCliente();
-                break;
-            case 3:
-                MCgetEspecifiCliente();
-                break;
-            case 4:
-                MCdeleteEspecifiCliente();
-                gestorClientes.guardarClientes();
-                break;
-            case 5:
-                MCactualizarCliente();
-                gestorClientes.guardarClientes();
-                break;
-            case 6:
-                break;
-           }
-    
-          } while (opcion != 6);
+                        ▄▄▄▄▄▄▄ ▄▄
+                        ███▀▀▀▀▀ ██ ▀▀               ██
+                        ███      ██ ██  ▄█▀█▄ ████▄ ▀██▀▀ ▄█▀█▄ ▄█▀▀▀
+                        ███      ██ ██  ██▄█▀ ██ ██  ██   ██▄█▀ ▀███▄
+                        ▀███████ ██ ██▄ ▀█▄▄▄ ██ ██  ██   ▀█▄▄▄ ▄▄▄█▀
+
+                            -- 1 -- Inscribir un cliente
+                            -- 2 -- Ver lista de clientes
+                            -- 3 -- Buscar cliente por documento
+                            -- 4 -- Eliminar un cliente
+                            -- 5 -- Actualizar un cliente
+                            -- 6 -- Salir de menú de cliente
+                                """);
+
+                opcion = consola.nextInt();
+                consola.nextLine(); // Limpiar buffer
+
+                switch (opcion) {
+                    case 1 -> mcAgregarCliente();
+                    case 2 -> mcListarClientes();
+                    case 3 -> mcBuscarCliente();
+                    case 4 -> mcEliminarCliente();
+                    case 5 -> mcActualizarCliente();
+                    case 6 -> System.out.println("Saliendo del menú de clientes...");
+                    default -> System.out.println("Opción no válida.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Error: Por favor, introduce un número válido.");
+                consola.nextLine(); // Limpiar el buffer de entrada
+                opcion = 0; // Resetear opción para continuar el bucle
+            }
+        } while (opcion != 6);
     }
 
+    private void mcAgregarCliente() {
+        System.out.println("--- Inscribir Nuevo Cliente ---");
+        Cliente nuevoCliente = solicitarDatosCliente(0);
+        Cliente clienteGuardado = clienteRepository.agregar(nuevoCliente);
+        System.out.println("Cliente inscrito exitosamente con ID: " + clienteGuardado.getId());
+        System.out.println(clienteGuardado);
+    }
 
-    public void MCagregarCliente(){
-        System.out.println("id");
-        int id = consola.nextInt();
-        consola.nextLine(); // LIMPIAR BUFFER
+    private void mcListarClientes() {
+        System.out.println("--- Lista de Clientes ---");
+        List<Cliente> clientes = clienteRepository.listar();
+        if (clientes.isEmpty()) {
+            System.out.println("No hay clientes registrados.");
+        } else {
+            clientes.forEach(System.out::println);
+        }
+    }
 
-        System.out.println("Dame el nombre del cliente");
+    private void mcBuscarCliente() {
+        System.out.println("--- Buscar Cliente por Documento ---");
+        System.out.print("Dame el documento del cliente a buscar: ");
+        try {
+            int documento = consola.nextInt();
+            consola.nextLine(); // Limpiar buffer
+            Cliente cliente = clienteRepository.obtenerPorDocumento(documento);
+            if (cliente != null) {
+                System.out.println("Cliente encontrado:");
+                System.out.println(cliente);
+            } else {
+                System.out.println("No se encontró un cliente con el documento: " + documento);
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Error: Documento inválido. Debe ser un número.");
+            consola.nextLine();
+        }
+    }
+
+    private void mcEliminarCliente() {
+        System.out.println("--- Eliminar Cliente ---");
+        System.out.print("Dame el documento del cliente a eliminar: ");
+        try {
+            int documento = consola.nextInt();
+            consola.nextLine(); // Limpiar buffer
+            if (clienteRepository.obtenerPorDocumento(documento) != null) {
+                clienteRepository.eliminar(documento);
+                System.out.println("Cliente con documento " + documento + " ha sido eliminado.");
+            } else {
+                System.out.println("No se encontró un cliente con el documento: " + documento);
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Error: Documento inválido. Debe ser un número.");
+            consola.nextLine();
+        }
+    }
+
+    private void mcActualizarCliente() {
+        System.out.println("--- Actualizar Cliente ---");
+        System.out.print("Dame el documento del cliente a actualizar: ");
+        try {
+            int documento = consola.nextInt();
+            consola.nextLine(); // Limpiar buffer
+
+            Cliente clienteExistente = clienteRepository.obtenerPorDocumento(documento);
+            if (clienteExistente == null) {
+                System.out.println("No se encontró un cliente con el documento: " + documento);
+                return;
+            }
+
+            System.out.println("Introduce los nuevos datos para el cliente con documento: " + documento);
+            Cliente datosNuevos = solicitarDatosCliente(documento);
+            datosNuevos.setId(clienteExistente.getId());
+
+            clienteRepository.actualizar(datosNuevos);
+            System.out.println("Cliente con documento " + documento + " ha sido actualizado.");
+        } catch (InputMismatchException e) {
+            System.out.println("Error: Documento inválido. Debe ser un número.");
+            consola.nextLine();
+        }
+    }
+
+    private Cliente solicitarDatosCliente(int documento) {
+        System.out.print("Nombre: ");
         String nombre = consola.nextLine();
 
-        System.out.println("Dame el documento del cliente");
-        int documento = consola.nextInt();
-        consola.nextLine(); // LIMPIAR BUFFER
+        int doc = documento;
+        if (doc == 0) {
+             while (doc == 0) {
+                try {
+                    System.out.print("Documento: ");
+                    doc = consola.nextInt();
+                } catch (InputMismatchException e) {
+                    System.out.println("Documento inválido. Introduce un número.");
+                } finally {
+                    consola.nextLine();
+                }
+            }
+        }
 
-        System.out.println("Dame el correo del cliente");
+
+        System.out.print("Correo: ");
         String correo = consola.nextLine();
 
-        System.out.println("Dame el telefono del cliente");
+        System.out.print("Teléfono: ");
         String telefono = consola.nextLine();
 
-        Clientes nuevo = new Clientes(id, nombre, documento, correo, telefono);
-        gestorClientes.agregarCliente(nuevo);
-    }
-
-    /* IMPORTANTE CAMBIAR, EL BUSSCADOR POR NOMBRE ESTA POR NOMBRE Y NO POR ID */
-    public void MCgetEspecifiCliente(){
-        consola.nextLine(); 
-        System.out.println("Dame el nombre del cliente que buscas ");
-        String MCnombre = consola.nextLine();
-
-        gestorClientes.getEspecifiCliente(MCnombre);
-    }
-
-
-    public void MCdeleteEspecifiCliente(){
-        consola.nextLine(); 
-        System.out.println("Dame el nombre del cliente que quieres eliminar ");
-        String MCnombre = consola.nextLine();
-
-        gestorClientes.deleteEspecifiCliente(MCnombre);
-    }
-
-
-    public void MCactualizarCliente(){
-        consola.nextLine(); 
-        System.out.println("Dame el nombre del cliente que quieres actualizar");
-        String actualizarCliente = consola.nextLine();
-
-        System.out.println("Ahora dame los datos que quieres actualizar de esa persona");
-        System.out.println("id");
-        int id = consola.nextInt();
-
-        consola.nextLine(); 
-        System.out.println("Dame el nombre del cliente");
-        String nombre = consola.nextLine();
-
-        System.out.println("Dame el documento del cliente");
-        int documento = consola.nextInt();
-
-        consola.nextLine(); 
-        System.out.println("Dame el correo del cliente");
-        String correo = consola.nextLine();
-
-        System.out.println("Dame el telefono del cliente");
-        String telefono = consola.nextLine();
-
-        Clientes actualizador = new Clientes(id, nombre, documento, correo, telefono);
-
-        gestorClientes.actualizarCliente(actualizarCliente, actualizador);
-    }
-
-    public static void main(String[] args) {
-
-        MenuClientes menuClientes = new MenuClientes();  // ← Correcto
-        System.out.println(menuClientes);
+        return new Cliente(0, nombre, doc, correo, telefono);
     }
 }
