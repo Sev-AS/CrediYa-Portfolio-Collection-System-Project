@@ -1,93 +1,129 @@
 package com.crediya.prestamos;
 
 public class Prestamos {
-    //Atributos
     private int id;
-    private int cliente_id;
-    private int empleado_id;
+    private int clienteId;
+    private int empleadoId;
     private double monto;
-    private double interes;
+    private double interesMensual;
     private int cuotas;
     private String fechaInicio;
-    private String estado; 
+    private String estado;
 
-    //Contructor
-    public Prestamos (int id, int cliente_id, int empleado_id, double monto, double interes, int cuotas, String fechaInicio, String estado){
+    // Campos calculados
+    private double montoTotal;
+    private double cuotaMensual;
+
+    public Prestamos(int id, int clienteId, int empleadoId, double monto, double interesMensual, int cuotas, String fechaInicio, String estado) {
         this.id = id;
-        this.cliente_id = cliente_id;
-        this.empleado_id = empleado_id;
+        this.clienteId = clienteId;
+        this.empleadoId = empleadoId;
         this.monto = monto;
-        this.interes = interes;
+        this.interesMensual = interesMensual;
         this.cuotas = cuotas;
         this.fechaInicio = fechaInicio;
         this.estado = estado;
+        
+        // Calcular valores derivados al crear el objeto
+        calcularValoresPrestamo();
     }
 
-    //Setters
+    /**
+     * Calcula el monto total del préstamo (incluyendo intereses) y el valor de la cuota mensual.
+     * Este método asume un cálculo de interés simple.
+     */
+    public void calcularValoresPrestamo() {
+        double interesTotal = this.monto * this.interesMensual * this.cuotas;
+        this.montoTotal = this.monto + interesTotal;
+        this.cuotaMensual = this.montoTotal / this.cuotas;
+    }
 
-    public void setP_id (int id){
-        this.id = id;        
+    // Getters y Setters (nombres estandarizados)
+    public int getId() {
+        return id;
     }
-    public void setP_cliente_id (int cliente_id){
-        this.cliente_id = cliente_id;
+
+    public void setId(int id) {
+        this.id = id;
     }
-    public void setP_empleado_id (int empleado_id){
-        this.empleado_id = empleado_id;
+
+    public int getClienteId() {
+        return clienteId;
     }
-    public void setP_monto (double monto){
+
+    public void setClienteId(int clienteId) {
+        this.clienteId = clienteId;
+    }
+
+    public int getEmpleadoId() {
+        return empleadoId;
+    }
+
+    public void setEmpleadoId(int empleadoId) {
+        this.empleadoId = empleadoId;
+    }
+
+    public double getMonto() {
+        return monto;
+    }
+
+    public void setMonto(double monto) {
         this.monto = monto;
     }
-    public void setP_interes (double interes){
-        this.interes = interes;
+
+    public double getInteresMensual() {
+        return interesMensual;
     }
-    public void setP_cuotas (int cuotas){
+
+    public void setInteresMensual(double interesMensual) {
+        this.interesMensual = interesMensual;
+    }
+
+    public int getCuotas() {
+        return cuotas;
+    }
+
+    public void setCuotas(int cuotas) {
         this.cuotas = cuotas;
     }
-    public void setP_fechaInicio (String fechaInicio){
+
+    public String getFechaInicio() {
+        return fechaInicio;
+    }
+
+    public void setFechaInicio(String fechaInicio) {
         this.fechaInicio = fechaInicio;
     }
-    public void setP_estado (String estado){
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
         this.estado = estado;
     }
 
-    //Getters
+    public double getMontoTotal() {
+        return montoTotal;
+    }
 
-    public int getP_id () {
-        return this.id;
-    }
-    public int getP_cliente_id () {
-        return this.cliente_id;
-    }
-    public int getP_empleado_id () {
-        return this.empleado_id;
-    }
-    public double getP_monto () {
-        return this.monto;
-    }
-    public double getP_interes () {
-        return this.interes;
-    }
-    public int getP_cuotas () {
-        return this.cuotas;
-    }
-    public String getP_fechaInicio () {
-        return this.fechaInicio;
-    }
-    public String getP_estado () {
-        return this.estado;
+    public double getCuotaMensual() {
+        return cuotaMensual;
     }
 
     @Override
-    public String toString (){
-        return "Prestamo " + "id = " + id + " cliente_id = "+ cliente_id + " empleado_id = " + empleado_id + " monto = " + monto + " interes = " + interes + " cuotas = " + cuotas + " fechaInicio = " + fechaInicio + " estado = " + estado;
+    public String toString() {
+        return "Prestamo{" +
+                "id=" + id +
+                ", clienteId=" + clienteId +
+                ", empleadoId=" + empleadoId +
+                ", monto=" + monto +
+                ", interesMensual=" + interesMensual +
+                ", cuotas=" + cuotas +
+                ", fechaInicio='" + fechaInicio + '\'' +
+                ", estado='" + estado + '\'' +
+                ", montoTotal=" + montoTotal +  
+                ", cuotaMensual=" + cuotaMensual + 
+                '}';
     }
-    /*
-        public static void main(String[] args) {
-        Prestamos p = new Prestamos(1, 1, 1, 2000, 0.8, 4, "2-Mayo", "Debe");
-
-        System.out.println(p.toString());
-        System.out.println(p.getP_fechaInicio());
-    }
-    */
-
 }

@@ -1,0 +1,10 @@
+package com.crediya.prestamos;
+
+import java.util.List;
+
+public interface PrestamoRepository {
+    Prestamos agregar(Prestamos prestamo);
+    List<Prestamos> listar();
+    Prestamos obtenerPorId(int id);
+    void cambiarEstado(int id, String nuevoEstado);
+}
