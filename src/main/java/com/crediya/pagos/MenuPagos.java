@@ -5,6 +5,7 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 import com.crediya.prestamos.PrestamoRepository;
 import com.crediya.prestamos.Prestamos;
+import com.crediya.reportes.ReportePagos;
 
 public class MenuPagos {
     private final PagosRepository pagosRepository;
@@ -27,7 +28,9 @@ public class MenuPagos {
                                  --- GESTION DE PAGOS ---
                                 1. Registrar Pago
                                 2. Listar Pagos de un Prestamo
-                                3. Volver
+                                3. Generar Reporte de Pagos por Prestamo
+                                4. Generar Reporte General de Pagos
+                                5. Volver
                                 """);
                 System.out.print("Opcion: ");
                 opcion = consola.nextInt();
@@ -36,7 +39,9 @@ public class MenuPagos {
                 switch (opcion) {
                     case 1 -> registrarPago();
                     case 2 -> listarPagos();
-                    case 3 -> System.out.println("Volviendo al menu principal...");
+                    case 3 -> generarReportePorPrestamo();
+                    case 4 -> generarReporteGeneral();
+                    case 5 -> System.out.println("Volviendo al menu principal...");
                     default -> System.out.println("Opcion no valida.");
                 }
             } catch (InputMismatchException e) {
@@ -44,7 +49,7 @@ public class MenuPagos {
                 consola.nextLine();
                 opcion = 0;
             }
-        } while (opcion != 3);
+        } while (opcion != 5);
     }
 
     private void registrarPago() {
@@ -77,7 +82,7 @@ public class MenuPagos {
             if (monto > prestamo.getSaldoPendiente()) {
                 System.out.println(
                         "Advertencia: El monto es mayor al saldo pendiente (" + prestamo.getSaldoPendiente() + ").");
-                System.out.print("¿Desea continuar y registrar un saldo a favor? (S/N): ");
+                System.out.print("Desea continuar y registrar un saldo a favor? (S/N): ");
                 String confirm = consola.nextLine();
                 if (!confirm.equalsIgnoreCase("S")) {
                     return;
@@ -127,6 +132,41 @@ public class MenuPagos {
         } catch (InputMismatchException e) {
             System.out.println("Valor invalido.");
             consola.nextLine();
+        }
+    }
+
+    private void generarReportePorPrestamo() {
+        System.out.println("--- Generar Reporte de Pagos por Prestamo ---");
+        try {
+            System.out.print("ID del Prestamo: ");
+            int prestamoId = consola.nextInt();
+            consola.nextLine();
+
+            Prestamos prestamo = prestamoRepository.obtenerPorId(prestamoId);
+            if (prestamo == null) {
+                System.out.println("Error: No existe un prestamo con ID " + prestamoId);
+                return;
+            }
+
+            String ruta = ReportePagos.generarReportePorPrestamo(prestamoId, pagosRepository, prestamoRepository);
+            if (ruta != null) {
+                System.out.println("Reporte generado exitosamente.");
+            } else {
+                System.out.println("Error al generar el reporte.");
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Valor invalido.");
+            consola.nextLine();
+        }
+    }
+
+    private void generarReporteGeneral() {
+        System.out.println("--- Generar Reporte General de Pagos ---");
+        String ruta = ReportePagos.generarReporteGeneral(pagosRepository, prestamoRepository);
+        if (ruta != null) {
+            System.out.println("Reporte general generado exitosamente.");
+        } else {
+            System.out.println("Error al generar el reporte general.");
         }
     }
 }
