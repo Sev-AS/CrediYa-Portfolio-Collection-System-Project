@@ -46,6 +46,12 @@ public class ReporteManager {
                 .collect(Collectors.toList());
     }
 
+    public static List<Prestamos> filtrarPrestamosActivos(List<Prestamos> prestamos) {
+        return prestamos.stream()
+                .filter(p -> p.getEstado().equalsIgnoreCase("Pendiente"))
+                .collect(Collectors.toList());
+    }
+
     public static List<Prestamos> filtrarPrestamosPorMontoMinimo(List<Prestamos> prestamos, double montoMinimo) {
         return prestamos.stream()
                 .filter(p -> p.getMonto() >= montoMinimo)
