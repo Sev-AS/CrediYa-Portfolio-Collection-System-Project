@@ -1,7 +1,6 @@
 package com.crediya.prestamos;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -31,11 +30,18 @@ public class PrestamoRepositoryJdbc implements PrestamoRepository {
                     "interes_mensual DOUBLE NOT NULL, " +
                     "cuotas INT NOT NULL, " +
                     "fecha_inicio VARCHAR(255), " +
-                    "estado VARCHAR(255))";
+                    "estado VARCHAR(255), " +
+                    "saldo_pendiente DOUBLE NOT NULL DEFAULT 0)";
+
             stmt.executeUpdate(sql);
 
+            try {
+                stmt.executeUpdate("ALTER TABLE prestamos ADD COLUMN saldo_pendiente DOUBLE NOT NULL DEFAULT 0");
+            } catch (SQLException e) {
+            }
+
         } catch (SQLException e) {
-            System.err.println("Error al inicializar el esquema de préstamos: " + e.getMessage());
+            System.err.println("Error al inicializar el esquema de prestamos: " + e.getMessage());
         }
     }
 
@@ -45,7 +51,7 @@ public class PrestamoRepositoryJdbc implements PrestamoRepository {
 
     @Override
     public Prestamos agregar(Prestamos prestamo) {
-        String sql = "INSERT INTO prestamos(cliente_id, empleado_id, monto, interes_mensual, cuotas, fecha_inicio, estado) VALUES(?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO prestamos(cliente_id, empleado_id, monto, interes_mensual, cuotas, fecha_inicio, estado, saldo_pendiente) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -56,6 +62,7 @@ public class PrestamoRepositoryJdbc implements PrestamoRepository {
             pstmt.setInt(5, prestamo.getCuotas());
             pstmt.setString(6, prestamo.getFechaInicio());
             pstmt.setString(7, prestamo.getEstado());
+            pstmt.setDouble(8, prestamo.getSaldoPendiente());
 
             int affectedRows = pstmt.executeUpdate();
 
@@ -66,11 +73,10 @@ public class PrestamoRepositoryJdbc implements PrestamoRepository {
                     }
                 }
             }
-            // Los valores calculados (montoTotal, cuotaMensual) ya están en el objeto
-            // prestamo
+
             return prestamo;
         } catch (SQLException e) {
-            System.err.println("Error al agregar préstamo: " + e.getMessage());
+            System.err.println("Error al agregar prestamo: " + e.getMessage());
             return null;
         }
     }
@@ -87,7 +93,7 @@ public class PrestamoRepositoryJdbc implements PrestamoRepository {
                 prestamos.add(mapRowToPrestamo(rs));
             }
         } catch (SQLException e) {
-            System.err.println("Error al listar préstamos: " + e.getMessage());
+            System.err.println("Error al listar prestamos: " + e.getMessage());
         }
         return prestamos;
     }
@@ -104,7 +110,7 @@ public class PrestamoRepositoryJdbc implements PrestamoRepository {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error al obtener préstamo por ID: " + e.getMessage());
+            System.err.println("Error al obtener prestamo por ID: " + e.getMessage());
         }
         return null;
     }
@@ -118,7 +124,20 @@ public class PrestamoRepositoryJdbc implements PrestamoRepository {
             pstmt.setInt(2, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("Error al cambiar estado del préstamo: " + e.getMessage());
+            System.err.println("Error al cambiar estado del prestamo: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void actualizarSaldo(int id, double nuevoSaldo) {
+        String sql = "UPDATE prestamos SET saldo_pendiente = ? WHERE id = ?";
+        try (Connection conn = getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setDouble(1, nuevoSaldo);
+            pstmt.setInt(2, id);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Error al actualizar saldo del prestamo: " + e.getMessage());
         }
     }
 
@@ -131,6 +150,7 @@ public class PrestamoRepositoryJdbc implements PrestamoRepository {
                 rs.getDouble("interes_mensual"),
                 rs.getInt("cuotas"),
                 rs.getString("fecha_inicio"),
-                rs.getString("estado"));
+                rs.getString("estado"),
+                rs.getDouble("saldo_pendiente"));
     }
 }

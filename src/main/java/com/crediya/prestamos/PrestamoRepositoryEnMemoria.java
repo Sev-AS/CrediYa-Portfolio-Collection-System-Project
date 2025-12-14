@@ -36,4 +36,13 @@ public class PrestamoRepositoryEnMemoria implements PrestamoRepository {
             prestamo.setEstado(nuevoEstado);
         }
     }
+
+    @Override
+    public void actualizarSaldo(int id, double nuevoSaldo) {
+        Prestamos prestamo = obtenerPorId(id);
+        if (prestamo != null) {
+            prestamo.setSaldoPendiente(nuevoSaldo);
+        }
+    }
+
 }

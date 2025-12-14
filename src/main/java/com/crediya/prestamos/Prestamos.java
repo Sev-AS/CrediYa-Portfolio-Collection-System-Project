@@ -9,12 +9,13 @@ public class Prestamos {
     private int cuotas;
     private String fechaInicio;
     private String estado;
+    private double saldoPendiente;
 
-    // Campos calculados
     private double montoTotal;
     private double cuotaMensual;
 
-    public Prestamos(int id, int clienteId, int empleadoId, double monto, double interesMensual, int cuotas, String fechaInicio, String estado) {
+    public Prestamos(int id, int clienteId, int empleadoId, double monto, double interesMensual, int cuotas,
+            String fechaInicio, String estado) {
         this.id = id;
         this.clienteId = clienteId;
         this.empleadoId = empleadoId;
@@ -23,22 +24,23 @@ public class Prestamos {
         this.cuotas = cuotas;
         this.fechaInicio = fechaInicio;
         this.estado = estado;
-        
-        // Calcular valores derivados al crear el objeto
+
         calcularValoresPrestamo();
+        this.saldoPendiente = this.montoTotal;
     }
 
-    /**
-     * Calcula el monto total del préstamo (incluyendo intereses) y el valor de la cuota mensual.
-     * Este método asume un cálculo de interés simple.
-     */
+    public Prestamos(int id, int clienteId, int empleadoId, double monto, double interesMensual, int cuotas,
+            String fechaInicio, String estado, double saldoPendiente) {
+        this(id, clienteId, empleadoId, monto, interesMensual, cuotas, fechaInicio, estado);
+        this.saldoPendiente = saldoPendiente;
+    }
+
     public void calcularValoresPrestamo() {
         double interesTotal = this.monto * this.interesMensual * this.cuotas;
         this.montoTotal = this.monto + interesTotal;
         this.cuotaMensual = this.montoTotal / this.cuotas;
     }
 
-    // Getters y Setters (nombres estandarizados)
     public int getId() {
         return id;
     }
@@ -111,6 +113,14 @@ public class Prestamos {
         return cuotaMensual;
     }
 
+    public double getSaldoPendiente() {
+        return saldoPendiente;
+    }
+
+    public void setSaldoPendiente(double saldoPendiente) {
+        this.saldoPendiente = saldoPendiente;
+    }
+
     @Override
     public String toString() {
         return "Prestamo{" +
@@ -122,8 +132,9 @@ public class Prestamos {
                 ", cuotas=" + cuotas +
                 ", fechaInicio='" + fechaInicio + '\'' +
                 ", estado='" + estado + '\'' +
-                ", montoTotal=" + montoTotal +  
-                ", cuotaMensual=" + cuotaMensual + 
+                ", montoTotal=" + montoTotal +
+                ", cuotaMensual=" + cuotaMensual +
+                ", saldoPendiente=" + saldoPendiente +
                 '}';
     }
 }

@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class EmpleadoRepositoryArchivo implements EmpleadoRepository {
 
-    private final String RUTA_ARCHIVO = "empleados.txt";
+    private final String RUTA_ARCHIVO = "src/main/java/com/crediya/db/data_txt/empleados.txt";
     private List<Empleado> empleados;
     private int proximoId;
 
@@ -75,7 +75,7 @@ public class EmpleadoRepositoryArchivo implements EmpleadoRepository {
     private void cargar() {
         File archivo = new File(RUTA_ARCHIVO);
         if (!archivo.exists()) {
-            return; // No hay nada que cargar
+            return;
         }
 
         try (Scanner scanner = new Scanner(archivo)) {
@@ -95,7 +95,7 @@ public class EmpleadoRepositoryArchivo implements EmpleadoRepository {
         } catch (FileNotFoundException e) {
             System.err.println("Error al cargar el archivo de empleados: " + e.getMessage());
         } catch (NumberFormatException e) {
-            System.err.println("Error al parsear un número en el archivo de empleados: " + e.getMessage());
+            System.err.println("Error al parsear un numero en el archivo de empleados: " + e.getMessage());
         }
     }
 
@@ -104,12 +104,11 @@ public class EmpleadoRepositoryArchivo implements EmpleadoRepository {
             for (Empleado empleado : empleados) {
                 writer.println(
                         empleado.getId() + ";" +
-                        empleado.getNombre() + ";" +
-                        empleado.getDocumento() + ";" +
-                        empleado.getRol() + ";" +
-                        empleado.getCorreo() + ";" +
-                        empleado.getSalario()
-                );
+                                empleado.getNombre() + ";" +
+                                empleado.getDocumento() + ";" +
+                                empleado.getRol() + ";" +
+                                empleado.getCorreo() + ";" +
+                                empleado.getSalario());
             }
         } catch (FileNotFoundException e) {
             System.err.println("Error al guardar el archivo de empleados: " + e.getMessage());

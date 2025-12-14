@@ -20,22 +20,17 @@ public class MenuClientes {
                 System.out.println(
                         """
 
-                        ▄▄▄▄▄▄▄ ▄▄
-                        ███▀▀▀▀▀ ██ ▀▀               ██
-                        ███      ██ ██  ▄█▀█▄ ████▄ ▀██▀▀ ▄█▀█▄ ▄█▀▀▀
-                        ███      ██ ██  ██▄█▀ ██ ██  ██   ██▄█▀ ▀███▄
-                        ▀███████ ██ ██▄ ▀█▄▄▄ ██ ██  ██   ▀█▄▄▄ ▄▄▄█▀
-
-                            -- 1 -- Inscribir un cliente
-                            -- 2 -- Ver lista de clientes
-                            -- 3 -- Buscar cliente por documento
-                            -- 4 -- Eliminar un cliente
-                            -- 5 -- Actualizar un cliente
-                            -- 6 -- Salir de menú de cliente
-                                """);
+                                --- GESTION DE CLIENTES ---
+                                    1. Inscribir un cliente
+                                    2. Ver lista de clientes
+                                    3. Buscar cliente por documento
+                                    4. Eliminar un cliente
+                                    5. Actualizar un cliente
+                                    6. Salir de menu de cliente
+                                        """);
 
                 opcion = consola.nextInt();
-                consola.nextLine(); // Limpiar buffer
+                consola.nextLine();
 
                 switch (opcion) {
                     case 1 -> mcAgregarCliente();
@@ -43,13 +38,13 @@ public class MenuClientes {
                     case 3 -> mcBuscarCliente();
                     case 4 -> mcEliminarCliente();
                     case 5 -> mcActualizarCliente();
-                    case 6 -> System.out.println("Saliendo del menú de clientes...");
-                    default -> System.out.println("Opción no válida.");
+                    case 6 -> System.out.println("Saliendo del menu de clientes...");
+                    default -> System.out.println("Opcion no valida.");
                 }
             } catch (InputMismatchException e) {
-                System.out.println("Error: Por favor, introduce un número válido.");
-                consola.nextLine(); // Limpiar el buffer de entrada
-                opcion = 0; // Resetear opción para continuar el bucle
+                System.out.println("Error: Por favor, introduce un numero valido.");
+                consola.nextLine();
+                opcion = 0;
             }
         } while (opcion != 6);
     }
@@ -77,16 +72,16 @@ public class MenuClientes {
         System.out.print("Dame el documento del cliente a buscar: ");
         try {
             int documento = consola.nextInt();
-            consola.nextLine(); // Limpiar buffer
+            consola.nextLine();
             Cliente cliente = clienteRepository.obtenerPorDocumento(documento);
             if (cliente != null) {
                 System.out.println("Cliente encontrado:");
                 System.out.println(cliente);
             } else {
-                System.out.println("No se encontró un cliente con el documento: " + documento);
+                System.out.println("No se encontro un cliente con el documento: " + documento);
             }
         } catch (InputMismatchException e) {
-            System.out.println("Error: Documento inválido. Debe ser un número.");
+            System.out.println("Error: Documento invalido. Debe ser un numero.");
             consola.nextLine();
         }
     }
@@ -96,15 +91,15 @@ public class MenuClientes {
         System.out.print("Dame el documento del cliente a eliminar: ");
         try {
             int documento = consola.nextInt();
-            consola.nextLine(); // Limpiar buffer
+            consola.nextLine();
             if (clienteRepository.obtenerPorDocumento(documento) != null) {
                 clienteRepository.eliminar(documento);
                 System.out.println("Cliente con documento " + documento + " ha sido eliminado.");
             } else {
-                System.out.println("No se encontró un cliente con el documento: " + documento);
+                System.out.println("No se encontro un cliente con el documento: " + documento);
             }
         } catch (InputMismatchException e) {
-            System.out.println("Error: Documento inválido. Debe ser un número.");
+            System.out.println("Error: Documento invalido. Debe ser un numero.");
             consola.nextLine();
         }
     }
@@ -114,11 +109,11 @@ public class MenuClientes {
         System.out.print("Dame el documento del cliente a actualizar: ");
         try {
             int documento = consola.nextInt();
-            consola.nextLine(); // Limpiar buffer
+            consola.nextLine();
 
             Cliente clienteExistente = clienteRepository.obtenerPorDocumento(documento);
             if (clienteExistente == null) {
-                System.out.println("No se encontró un cliente con el documento: " + documento);
+                System.out.println("No se encontro un cliente con el documento: " + documento);
                 return;
             }
 
@@ -129,7 +124,7 @@ public class MenuClientes {
             clienteRepository.actualizar(datosNuevos);
             System.out.println("Cliente con documento " + documento + " ha sido actualizado.");
         } catch (InputMismatchException e) {
-            System.out.println("Error: Documento inválido. Debe ser un número.");
+            System.out.println("Error: Documento invalido. Debe ser un numero.");
             consola.nextLine();
         }
     }
@@ -140,23 +135,22 @@ public class MenuClientes {
 
         int doc = documento;
         if (doc == 0) {
-             while (doc == 0) {
+            while (doc == 0) {
                 try {
                     System.out.print("Documento: ");
                     doc = consola.nextInt();
                 } catch (InputMismatchException e) {
-                    System.out.println("Documento inválido. Introduce un número.");
+                    System.out.println("Documento invalido. Introduce un numero.");
                 } finally {
                     consola.nextLine();
                 }
             }
         }
 
-
         System.out.print("Correo: ");
         String correo = consola.nextLine();
 
-        System.out.print("Teléfono: ");
+        System.out.print("Telefono: ");
         String telefono = consola.nextLine();
 
         return new Cliente(0, nombre, doc, correo, telefono);

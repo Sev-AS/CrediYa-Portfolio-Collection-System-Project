@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public class ClienteRepositoryArchivo implements ClienteRepository {
 
-    private final String RUTA_ARCHIVO = "clientes.txt";
+    private final String RUTA_ARCHIVO = "src/main/java/com/crediya/db/data_txt/clientes.txt";
     private List<Cliente> clientes;
     private int proximoId;
 
@@ -87,7 +87,7 @@ public class ClienteRepositoryArchivo implements ClienteRepository {
         } catch (FileNotFoundException e) {
             System.err.println("Error al cargar el archivo de clientes: " + e.getMessage());
         } catch (NumberFormatException e) {
-            System.err.println("Error al parsear un número en el archivo de clientes: " + e.getMessage());
+            System.err.println("Error al parsear un numero en el archivo de clientes: " + e.getMessage());
         }
     }
 
@@ -96,11 +96,10 @@ public class ClienteRepositoryArchivo implements ClienteRepository {
             for (Cliente cliente : clientes) {
                 writer.println(
                         cliente.getId() + ";" +
-                        cliente.getNombre() + ";" +
-                        cliente.getDocumento() + ";" +
-                        cliente.getCorreo() + ";" +
-                        cliente.getTelefono()
-                );
+                                cliente.getNombre() + ";" +
+                                cliente.getDocumento() + ";" +
+                                cliente.getCorreo() + ";" +
+                                cliente.getTelefono());
             }
         } catch (FileNotFoundException e) {
             System.err.println("Error al guardar el archivo de clientes: " + e.getMessage());

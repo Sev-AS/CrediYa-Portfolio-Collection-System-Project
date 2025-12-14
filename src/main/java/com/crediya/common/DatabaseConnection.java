@@ -6,9 +6,9 @@ import java.sql.SQLException;
 
 public class DatabaseConnection {
     public Connection getConnection() throws SQLException {
-        String url = "jdbc:mysql://localhost:3306/crediya_db";
+        String url = "jdbc:mysql://localhost:3306/CrediYa_Portfolio_Collection_System_Project?createDatabaseIfNotExist=true";
         String user = "root";
-        String password = "root";
+        String password = "admin";
         return DriverManager.getConnection(url, user, password);
     }
 }
