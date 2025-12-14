@@ -52,6 +52,26 @@ public class ReporteManager {
                 .collect(Collectors.toList());
     }
 
+    public static List<Prestamos> filtrarPrestamosVencidos(List<Prestamos> prestamos) {
+        return prestamos.stream()
+                .filter(p -> p.getEstado().equalsIgnoreCase("Vencido"))
+                .filter(p -> p.getSaldoPendiente() > 0)
+                .collect(Collectors.toList());
+    }
+
+    public static List<Cliente> filtrarClientesMorosos(List<Cliente> clientes, List<Prestamos> prestamos) {
+        List<Integer> clientesConPrestamosVencidos = prestamos.stream()
+                .filter(p -> p.getEstado().equalsIgnoreCase("Vencido"))
+                .filter(p -> p.getSaldoPendiente() > 0)
+                .map(Prestamos::getClienteId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        return clientes.stream()
+                .filter(c -> clientesConPrestamosVencidos.contains(c.getId()))
+                .collect(Collectors.toList());
+    }
+
     public static List<Prestamos> filtrarPrestamosPorMontoMinimo(List<Prestamos> prestamos, double montoMinimo) {
         return prestamos.stream()
                 .filter(p -> p.getMonto() >= montoMinimo)
