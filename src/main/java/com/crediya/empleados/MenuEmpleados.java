@@ -18,9 +18,14 @@ public class MenuEmpleados {
         do {
             try {
                 System.out.println(
-                        """
-
-                                --- GESTION DE EMPLEADOS ---
+                        """                                                   
+                                     ▄▄▄▄▄▄▄                ▄▄                ▄▄       
+                                    ███▀▀▀▀▀                ██                ██       
+                                    ███▄▄    ███▄███▄ ████▄ ██ ▄█▀█▄  ▀▀█▄ ▄████ ▄███▄ 
+                                    ███      ██ ██ ██ ██ ██ ██ ██▄█▀ ▄█▀██ ██ ██ ██ ██ 
+                                    ▀███████ ██ ██ ██ ████▀ ██ ▀█▄▄▄ ▀█▄██ ▀████ ▀███▀ 
+                                                      ██                               
+                                                      ▀▀                               
                                                1. Inscribir un empleado
                                                2. Ver lista de empleados
                                                3. Buscar empleado por ID
@@ -42,7 +47,7 @@ public class MenuEmpleados {
                     default -> System.out.println("Opcion no valida.");
                 }
             } catch (InputMismatchException e) {
-                System.out.println("Error: Por favor, introduce un numero valido.");
+                System.out.println("Introduzca un numero valido.");
                 consola.nextLine();
                 opcion = 0;
             }
@@ -50,15 +55,26 @@ public class MenuEmpleados {
     }
 
     private void meAgregarEmpleado() {
-        System.out.println("--- Inscribir Nuevo Empleado ---");
-        Empleado nuevoEmpleado = solicitarDatosEmpleado();
-        Empleado empleadoGuardado = empleadoRepository.agregar(nuevoEmpleado);
-        System.out.println("Empleado inscrito exitosamente con ID: " + empleadoGuardado.getId());
-        System.out.println(empleadoGuardado);
+        System.out.println("Inscribir Nuevo Empleado");
+        try {
+            Empleado nuevoEmpleado = solicitarDatosEmpleado();
+            
+            Empleado empleadoGuardado = empleadoRepository.agregar(nuevoEmpleado);
+            if (empleadoGuardado != null) {
+                System.out.println("Empleado inscrito exitosamente con ID: " + empleadoGuardado.getId());
+                System.out.println(empleadoGuardado);
+            } else {
+                System.out.println("Error: No se pudo guardar el empleado.");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error de validacion: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Error inesperado al agregar empleado: " + e.getMessage());
+        }
     }
 
     private void meListarEmpleados() {
-        System.out.println("--- Lista de Empleados ---");
+        System.out.println("Lista de Empleados");
         List<Empleado> empleados = empleadoRepository.listar();
         if (empleados.isEmpty()) {
             System.out.println("No hay empleados registrados.");
@@ -68,8 +84,8 @@ public class MenuEmpleados {
     }
 
     private void meBuscarEmpleado() {
-        System.out.println("--- Buscar Empleado por ID ---");
-        System.out.print("Dame el ID del empleado a buscar: ");
+        System.out.println("Buscar Empleado por ID");
+        System.out.print("Ingrese el ID del empleado a buscar: ");
         try {
             int id = consola.nextInt();
             consola.nextLine();
@@ -81,14 +97,14 @@ public class MenuEmpleados {
                 System.out.println("No se encontro un empleado con el ID: " + id);
             }
         } catch (InputMismatchException e) {
-            System.out.println("Error: ID invalido. Debe ser un numero.");
+            System.out.println("Ingrese un numero entero positivo.");
             consola.nextLine();
         }
     }
 
     private void meEliminarEmpleado() {
-        System.out.println("--- Eliminar Empleado ---");
-        System.out.print("Dame el ID del empleado a eliminar: ");
+        System.out.println("Eliminar Empleado");
+        System.out.print("Ingrese el ID del empleado a eliminar: ");
         try {
             int id = consola.nextInt();
             consola.nextLine();
@@ -99,14 +115,14 @@ public class MenuEmpleados {
                 System.out.println("No se encontro un empleado con el ID: " + id);
             }
         } catch (InputMismatchException e) {
-            System.out.println("Error: ID invalido. Debe ser un numero.");
+            System.out.println("Ingrese un numero entero positivo.");
             consola.nextLine();
         }
     }
 
     private void meActualizarEmpleado() {
-        System.out.println("--- Actualizar Empleado ---");
-        System.out.print("Dame el ID del empleado a actualizar: ");
+        System.out.println("Actualizar Empleado");
+        System.out.print("Ingrese el ID del empleado a actualizar: ");
         try {
             int id = consola.nextInt();
             consola.nextLine();
@@ -116,58 +132,61 @@ public class MenuEmpleados {
                 return;
             }
 
-            System.out.println("Introduce los nuevos datos para el empleado con ID: " + id);
+            System.out.println("Introduzca los nuevos datos para el empleado con ID: " + id);
             Empleado datosNuevos = solicitarDatosEmpleado();
             datosNuevos.setId(id);
 
             empleadoRepository.actualizar(datosNuevos);
             System.out.println("Empleado con ID " + id + " ha sido actualizado.");
         } catch (InputMismatchException e) {
-            System.out.println("Error: ID invalido. Debe ser un numero.");
+            System.out.println("Ingrese un numero entero positivo.");
             consola.nextLine();
         }
     }
 
     private Empleado solicitarDatosEmpleado() {
         System.out.print("Nombre: ");
-        String nombre = consola.nextLine();
+        String nombre = consola.nextLine().trim();
+        if (nombre.isEmpty()) {
+            throw new IllegalArgumentException("El nombre no puede estar vacio.");
+        }
 
         int documento = 0;
-        while (documento == 0) {
+        while (documento <= 0) {
             try {
                 System.out.print("Documento: ");
                 documento = consola.nextInt();
+                if (documento <= 0) {
+                    System.out.println("El documento debe ser un numero positivo.");
+                }
             } catch (InputMismatchException e) {
-                System.out.println("Documento invalido. Introduce un numero.");
+                System.out.println("Introduzca un numero.");
             } finally {
                 consola.nextLine();
             }
         }
 
         System.out.print("Rol: ");
-        String rol = consola.nextLine();
+        String rol = consola.nextLine().trim();
 
         System.out.print("Correo: ");
-        String correo = consola.nextLine();
+        String correo = consola.nextLine().trim();
 
-        double salario = 0.0;
-        while (salario == 0.0) {
+        double salario = -1.0;
+        while (salario < 0) {
             try {
                 System.out.print("Salario: ");
                 salario = consola.nextDouble();
+                if (salario < 0) {
+                    System.out.println("El salario debe ser un numero positivo.");
+                }
             } catch (InputMismatchException e) {
-                System.out.println("Salario invalido. Introduce un numero.");
+                System.out.println("Introduzca un numero.");
             } finally {
                 consola.nextLine();
             }
         }
 
         return new Empleado(0, nombre, documento, rol, correo, salario);
-    }
-
-    public static void main(String[] args) {
-        EmpleadoRepository repository = new EmpleadoRepositoryArchivo();
-        MenuEmpleados menu = new MenuEmpleados(repository);
-        menu.iniciarMenu();
     }
 }

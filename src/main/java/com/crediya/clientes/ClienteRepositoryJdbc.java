@@ -25,10 +25,10 @@ public class ClienteRepositoryJdbc implements ClienteRepository {
 
             String sql = "CREATE TABLE IF NOT EXISTS clientes (" +
                     "id INT AUTO_INCREMENT PRIMARY KEY, " +
-                    "nombre VARCHAR(255) NOT NULL, " +
-                    "documento INT NOT NULL UNIQUE, " +
-                    "correo VARCHAR(255), " +
-                    "telefono VARCHAR(255))";
+                    "nombre VARCHAR(80) NOT NULL, " +
+                    "documento VARCHAR(30) UNIQUE NOT NULL, " +
+                    "correo VARCHAR(80) NOT NULL, " +
+                    "telefono VARCHAR(20) NOT NULL)";
             stmt.executeUpdate(sql);
 
         } catch (SQLException e) {
@@ -47,7 +47,7 @@ public class ClienteRepositoryJdbc implements ClienteRepository {
                 PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setString(1, cliente.getNombre());
-            pstmt.setInt(2, cliente.getDocumento());
+            pstmt.setString(2, String.valueOf(cliente.getDocumento()));
             pstmt.setString(3, cliente.getCorreo());
             pstmt.setString(4, cliente.getTelefono());
 
@@ -89,7 +89,7 @@ public class ClienteRepositoryJdbc implements ClienteRepository {
         String sql = "SELECT * FROM clientes WHERE documento = ?";
         try (Connection conn = getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, documento);
+            pstmt.setString(1, String.valueOf(documento));
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     return mapRowToCliente(rs);
@@ -109,7 +109,7 @@ public class ClienteRepositoryJdbc implements ClienteRepository {
             pstmt.setString(1, cliente.getNombre());
             pstmt.setString(2, cliente.getCorreo());
             pstmt.setString(3, cliente.getTelefono());
-            pstmt.setInt(4, cliente.getDocumento());
+            pstmt.setString(4, String.valueOf(cliente.getDocumento()));
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Error al actualizar cliente: " + e.getMessage());
@@ -121,7 +121,7 @@ public class ClienteRepositoryJdbc implements ClienteRepository {
         String sql = "DELETE FROM clientes WHERE documento = ?";
         try (Connection conn = getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, documento);
+            pstmt.setString(1, String.valueOf(documento));
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Error al eliminar cliente: " + e.getMessage());
@@ -129,10 +129,18 @@ public class ClienteRepositoryJdbc implements ClienteRepository {
     }
 
     private Cliente mapRowToCliente(ResultSet rs) throws SQLException {
+        String docStr = rs.getString("documento");
+        int documento;
+        try {
+            documento = Integer.parseInt(docStr);
+        } catch (NumberFormatException e) {
+            throw new SQLException("Documento no es un numero valido: " + docStr);
+        }
+        
         return new Cliente(
                 rs.getInt("id"),
                 rs.getString("nombre"),
-                rs.getInt("documento"),
+                documento,
                 rs.getString("correo"),
                 rs.getString("telefono"));
     }

@@ -26,19 +26,16 @@ public class PrestamoRepositoryJdbc implements PrestamoRepository {
                     "id INT AUTO_INCREMENT PRIMARY KEY, " +
                     "cliente_id INT NOT NULL, " +
                     "empleado_id INT NOT NULL, " +
-                    "monto DOUBLE NOT NULL, " +
-                    "interes_mensual DOUBLE NOT NULL, " +
+                    "monto DECIMAL(12,2) NOT NULL, " +
+                    "interes DECIMAL(5,2) NOT NULL, " +
                     "cuotas INT NOT NULL, " +
-                    "fecha_inicio VARCHAR(255), " +
-                    "estado VARCHAR(255), " +
-                    "saldo_pendiente DOUBLE NOT NULL DEFAULT 0)";
+                    "fecha_inicio DATE NOT NULL, " +
+                    "estado VARCHAR(20) NOT NULL DEFAULT 'PENDIENTE', " +
+                    "saldo_pendiente DECIMAL(12,2) DEFAULT 0, " +
+                    "FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE, " +
+                    "FOREIGN KEY (empleado_id) REFERENCES empleados(id) ON DELETE CASCADE)";
 
             stmt.executeUpdate(sql);
-
-            try {
-                stmt.executeUpdate("ALTER TABLE prestamos ADD COLUMN saldo_pendiente DOUBLE NOT NULL DEFAULT 0");
-            } catch (SQLException e) {
-            }
 
         } catch (SQLException e) {
             System.err.println("Error al inicializar el esquema de prestamos: " + e.getMessage());
@@ -51,18 +48,19 @@ public class PrestamoRepositoryJdbc implements PrestamoRepository {
 
     @Override
     public Prestamos agregar(Prestamos prestamo) {
-        String sql = "INSERT INTO prestamos(cliente_id, empleado_id, monto, interes_mensual, cuotas, fecha_inicio, estado, saldo_pendiente) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO prestamos(cliente_id, empleado_id, monto, interes, cuotas, fecha_inicio, estado, saldo_pendiente) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setInt(1, prestamo.getClienteId());
             pstmt.setInt(2, prestamo.getEmpleadoId());
-            pstmt.setDouble(3, prestamo.getMonto());
-            pstmt.setDouble(4, prestamo.getInteresMensual());
+            pstmt.setBigDecimal(3, java.math.BigDecimal.valueOf(prestamo.getMonto()));
+            pstmt.setBigDecimal(4, java.math.BigDecimal.valueOf(prestamo.getInteresMensual() * 100.0));
             pstmt.setInt(5, prestamo.getCuotas());
-            pstmt.setString(6, prestamo.getFechaInicio());
+            java.sql.Date fechaDate = java.sql.Date.valueOf(prestamo.getFechaInicio());
+            pstmt.setDate(6, fechaDate);
             pstmt.setString(7, prestamo.getEstado());
-            pstmt.setDouble(8, prestamo.getSaldoPendiente());
+            pstmt.setBigDecimal(8, java.math.BigDecimal.valueOf(prestamo.getSaldoPendiente()));
 
             int affectedRows = pstmt.executeUpdate();
 
@@ -114,6 +112,24 @@ public class PrestamoRepositoryJdbc implements PrestamoRepository {
         }
         return null;
     }
+    
+    @Override
+    public List<Prestamos> obtenerPorClienteId(int clienteId) {
+        List<Prestamos> prestamos = new ArrayList<>();
+        String sql = "SELECT * FROM prestamos WHERE cliente_id = ?";
+        try (Connection conn = getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, clienteId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    prestamos.add(mapRowToPrestamo(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener prestamos por cliente ID: " + e.getMessage());
+        }
+        return prestamos;
+    }
 
     @Override
     public void cambiarEstado(int id, String nuevoEstado) {
@@ -133,7 +149,7 @@ public class PrestamoRepositoryJdbc implements PrestamoRepository {
         String sql = "UPDATE prestamos SET saldo_pendiente = ? WHERE id = ?";
         try (Connection conn = getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setDouble(1, nuevoSaldo);
+            pstmt.setBigDecimal(1, java.math.BigDecimal.valueOf(nuevoSaldo));
             pstmt.setInt(2, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -142,15 +158,27 @@ public class PrestamoRepositoryJdbc implements PrestamoRepository {
     }
 
     private Prestamos mapRowToPrestamo(ResultSet rs) throws SQLException {
+        double interesPorcentaje = rs.getBigDecimal("interes").doubleValue();
+        double interesMensual = interesPorcentaje / 100.0; 
+        
+        java.sql.Date fechaDate = rs.getDate("fecha_inicio");
+        String fechaInicio = (fechaDate != null) ? fechaDate.toString() : "";
+        
+        double saldoPendiente = 0.0;
+        java.math.BigDecimal saldoBD = rs.getBigDecimal("saldo_pendiente");
+        if (saldoBD != null) {
+            saldoPendiente = saldoBD.doubleValue();
+        }
+        
         return new Prestamos(
                 rs.getInt("id"),
                 rs.getInt("cliente_id"),
                 rs.getInt("empleado_id"),
-                rs.getDouble("monto"),
-                rs.getDouble("interes_mensual"),
+                rs.getBigDecimal("monto").doubleValue(),
+                interesMensual,
                 rs.getInt("cuotas"),
-                rs.getString("fecha_inicio"),
+                fechaInicio,
                 rs.getString("estado"),
-                rs.getDouble("saldo_pendiente"));
+                saldoPendiente);
     }
 }

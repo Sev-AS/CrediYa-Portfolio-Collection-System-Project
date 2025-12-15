@@ -25,7 +25,14 @@ public class MenuPagos {
                 System.out.println(
                         """
 
-                                 --- GESTION DE PAGOS ---
+                                 
+                        ▄▄▄▄▄▄▄                          
+                        ███▀▀███▄                        
+                        ███▄▄███▀ ▀▀█▄ ▄████ ▄███▄ ▄█▀▀▀ 
+                        ███▀▀▀▀  ▄█▀██ ██ ██ ██ ██ ▀███▄ 
+                        ███      ▀█▄██ ▀████ ▀███▀ ▄▄▄█▀ 
+                                          ██             
+                                        ▀▀▀              
                                 1. Registrar Pago
                                 2. Listar Pagos de un Prestamo
                                 3. Generar Reporte de Pagos por Prestamo
@@ -45,7 +52,7 @@ public class MenuPagos {
                     default -> System.out.println("Opcion no valida.");
                 }
             } catch (InputMismatchException e) {
-                System.out.println("Error: Por favor, introduce un numero valido.");
+                System.out.println("Introduzca un numero valido.");
                 consola.nextLine();
                 opcion = 0;
             }
@@ -53,14 +60,14 @@ public class MenuPagos {
     }
 
     private void registrarPago() {
-        System.out.println("--- Registrar Pago ---");
+        System.out.println("Registrar Pago");
         try {
             System.out.print("ID del Prestamo: ");
             int prestamoId = consola.nextInt();
 
             Prestamos prestamo = prestamoRepository.obtenerPorId(prestamoId);
             if (prestamo == null) {
-                System.out.println("Error: No existe un prestamo con ID " + prestamoId);
+                System.out.println("No existe un prestamo con ID " + prestamoId);
                 return;
             }
 
@@ -91,33 +98,40 @@ public class MenuPagos {
 
             String fecha = LocalDate.now().toString();
 
+            double nuevoSaldo = prestamo.getSaldoPendiente() - monto;
+            if (Math.abs(nuevoSaldo) < 0.01) {
+                nuevoSaldo = 0;
+            }
+
             Pagos pago = new Pagos(0, prestamoId, monto, fecha);
-            Pagos pagoRegistrado = pagosRepository.registrar(pago);
+            
+            Pagos pagoRegistrado = pagosRepository.registrarPagoConActualizacionSaldo(pago, nuevoSaldo, prestamoId);
 
             if (pagoRegistrado != null) {
-                double nuevoSaldo = prestamo.getSaldoPendiente() - monto;
-                if (Math.abs(nuevoSaldo) < 0.01)
-                    nuevoSaldo = 0;
-
-                prestamoRepository.actualizarSaldo(prestamoId, nuevoSaldo);
+                if (pagosRepository instanceof PagosRepositoryArchivo) {
+                    prestamoRepository.actualizarSaldo(prestamoId, nuevoSaldo);
+                    if (nuevoSaldo <= 0) {
+                        prestamoRepository.cambiarEstado(prestamoId, "Pagado");
+                    }
+                }
+                
                 System.out.println("Pago registrado exitosamente. Nuevo saldo pendiente: " + nuevoSaldo);
 
                 if (nuevoSaldo <= 0) {
-                    prestamoRepository.cambiarEstado(prestamoId, "Pagado");
                     System.out.println("El prestamo ha sido marcado como 'Pagado'.");
                 }
             } else {
-                System.out.println("Error al registrar el pago en la base de datos.");
+                System.out.println("Error al registrar el pago. La operacion fue revertida.");
             }
 
         } catch (InputMismatchException e) {
-            System.out.println("Error: Valor invalido.");
+            System.out.println("Valor invalido.");
             consola.nextLine();
         }
     }
 
     private void listarPagos() {
-        System.out.println("--- Listar Pagos por Prestamo ---");
+        System.out.println("Listar Pagos por Prestamo");
         try {
             System.out.print("ID del Prestamo: ");
             int prestamoId = consola.nextInt();
@@ -136,7 +150,7 @@ public class MenuPagos {
     }
 
     private void generarReportePorPrestamo() {
-        System.out.println("--- Generar Reporte de Pagos por Prestamo ---");
+        System.out.println("Generar Reporte de Pagos por Prestamo");
         try {
             System.out.print("ID del Prestamo: ");
             int prestamoId = consola.nextInt();
@@ -144,7 +158,7 @@ public class MenuPagos {
 
             Prestamos prestamo = prestamoRepository.obtenerPorId(prestamoId);
             if (prestamo == null) {
-                System.out.println("Error: No existe un prestamo con ID " + prestamoId);
+                System.out.println("No existe un prestamo con ID " + prestamoId);
                 return;
             }
 
@@ -161,7 +175,7 @@ public class MenuPagos {
     }
 
     private void generarReporteGeneral() {
-        System.out.println("--- Generar Reporte General de Pagos ---");
+        System.out.println("Generar Reporte General de Pagos");
         String ruta = ReportePagos.generarReporteGeneral(pagosRepository, prestamoRepository);
         if (ruta != null) {
             System.out.println("Reporte general generado exitosamente.");

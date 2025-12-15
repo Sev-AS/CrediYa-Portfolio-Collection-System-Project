@@ -25,15 +25,15 @@ public class EmpleadoRepositoryJdbc implements EmpleadoRepository {
 
             String sql = "CREATE TABLE IF NOT EXISTS empleados (" +
                     "id INT AUTO_INCREMENT PRIMARY KEY, " +
-                    "nombre VARCHAR(255) NOT NULL, " +
-                    "documento INT NOT NULL, " +
-                    "rol VARCHAR(255), " +
-                    "correo VARCHAR(255), " +
-                    "salario DOUBLE)";
+                    "nombre VARCHAR(80) NOT NULL, " +
+                    "documento VARCHAR(30) UNIQUE NOT NULL, " +
+                    "rol VARCHAR(30) NOT NULL, " +
+                    "correo VARCHAR(80) NOT NULL, " +
+                    "salario DECIMAL(10,2) NOT NULL)";
             stmt.executeUpdate(sql);
 
         } catch (SQLException e) {
-            System.err.println("Error al inicializar el esquema de la base de datos: " + e.getMessage());
+            System.err.println("Error en la base de datos: " + e.getMessage());
         }
     }
 
@@ -48,10 +48,10 @@ public class EmpleadoRepositoryJdbc implements EmpleadoRepository {
                 PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setString(1, empleado.getNombre());
-            pstmt.setInt(2, empleado.getDocumento());
+            pstmt.setString(2, String.valueOf(empleado.getDocumento()));
             pstmt.setString(3, empleado.getRol());
             pstmt.setString(4, empleado.getCorreo());
-            pstmt.setDouble(5, empleado.getSalario());
+            pstmt.setBigDecimal(5, java.math.BigDecimal.valueOf(empleado.getSalario()));
 
             int affectedRows = pstmt.executeUpdate();
 
@@ -109,10 +109,10 @@ public class EmpleadoRepositoryJdbc implements EmpleadoRepository {
         try (Connection conn = getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, empleado.getNombre());
-            pstmt.setInt(2, empleado.getDocumento());
+            pstmt.setString(2, String.valueOf(empleado.getDocumento()));
             pstmt.setString(3, empleado.getRol());
             pstmt.setString(4, empleado.getCorreo());
-            pstmt.setDouble(5, empleado.getSalario());
+            pstmt.setBigDecimal(5, java.math.BigDecimal.valueOf(empleado.getSalario()));
             pstmt.setInt(6, empleado.getId());
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -133,12 +133,22 @@ public class EmpleadoRepositoryJdbc implements EmpleadoRepository {
     }
 
     private Empleado mapRowToEmpleado(ResultSet rs) throws SQLException {
+        String docStr = rs.getString("documento");
+        int documento;
+        try {
+            documento = Integer.parseInt(docStr);
+        } catch (NumberFormatException e) {
+            throw new SQLException("Documento no es un numero valido: " + docStr);
+        }
+        
+        double salario = rs.getBigDecimal("salario").doubleValue();
+        
         return new Empleado(
                 rs.getInt("id"),
                 rs.getString("nombre"),
-                rs.getInt("documento"),
+                documento,
                 rs.getString("rol"),
                 rs.getString("correo"),
-                rs.getDouble("salario"));
+                salario);
     }
 }

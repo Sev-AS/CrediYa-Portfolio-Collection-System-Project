@@ -48,6 +48,13 @@ public class PrestamoRepositoryArchivo implements PrestamoRepository {
                 .findFirst()
                 .orElse(null);
     }
+    
+    @Override
+    public List<Prestamos> obtenerPorClienteId(int clienteId) {
+        return prestamos.stream()
+                .filter(p -> p.getClienteId() == clienteId)
+                .collect(java.util.stream.Collectors.toList());
+    }
 
     @Override
     public void cambiarEstado(int id, String nuevoEstado) {

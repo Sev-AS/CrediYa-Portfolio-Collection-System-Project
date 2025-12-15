@@ -36,8 +36,15 @@ public class Prestamos {
     }
 
     public void calcularValoresPrestamo() {
+        if (this.monto <= 0 || this.cuotas <= 0 || this.interesMensual < 0) {
+            throw new IllegalArgumentException(
+                "El monto y las cuotas deben ser mayores a 0, y el interes no puede ser negativo.");
+        }
+        
         double interesTotal = this.monto * this.interesMensual * this.cuotas;
+        
         this.montoTotal = this.monto + interesTotal;
+        
         this.cuotaMensual = this.montoTotal / this.cuotas;
     }
 
@@ -123,18 +130,18 @@ public class Prestamos {
 
     @Override
     public String toString() {
-        return "Prestamo{" +
-                "id=" + id +
-                ", clienteId=" + clienteId +
-                ", empleadoId=" + empleadoId +
-                ", monto=" + monto +
-                ", interesMensual=" + interesMensual +
-                ", cuotas=" + cuotas +
-                ", fechaInicio='" + fechaInicio + '\'' +
-                ", estado='" + estado + '\'' +
-                ", montoTotal=" + montoTotal +
-                ", cuotaMensual=" + cuotaMensual +
-                ", saldoPendiente=" + saldoPendiente +
+        return "Prestamo{"
+                + "id=" + id + ", "
+                + "clienteId=" + clienteId + ", "
+                + "empleadoId=" + empleadoId + ", "
+                + "monto=" + monto + ", "
+                + "interesMensual=" + interesMensual + ", "
+                + "cuotas=" + cuotas + ", "
+                + "fechaInicio='" + fechaInicio + "'" + ", "
+                + "estado='" + estado + "'" + ", "
+                + "montoTotal=" + montoTotal + ", "
+                + "cuotaMensual=" + cuotaMensual + ", "
+                + "saldoPendiente=" + saldoPendiente + 
                 '}';
     }
 }

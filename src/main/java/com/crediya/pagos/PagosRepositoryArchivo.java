@@ -41,6 +41,11 @@ public class PagosRepositoryArchivo implements PagosRepository {
                 .filter(p -> p.getPrestamoId() == prestamoId)
                 .collect(Collectors.toList());
     }
+    
+    @Override
+    public Pagos registrarPagoConActualizacionSaldo(Pagos pago, double nuevoSaldo, int prestamoId) {
+        return registrar(pago);
+    }
 
     private void cargar() {
         File archivo = new File(RUTA_ARCHIVO);

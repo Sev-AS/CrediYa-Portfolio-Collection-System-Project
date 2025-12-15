@@ -8,6 +8,8 @@ public interface PrestamoRepository {
     List<Prestamos> listar();
 
     Prestamos obtenerPorId(int id);
+    
+    List<Prestamos> obtenerPorClienteId(int clienteId);
 
     void cambiarEstado(int id, String nuevoEstado);
 

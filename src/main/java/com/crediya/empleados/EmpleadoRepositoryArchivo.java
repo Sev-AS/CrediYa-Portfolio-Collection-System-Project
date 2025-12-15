@@ -95,7 +95,7 @@ public class EmpleadoRepositoryArchivo implements EmpleadoRepository {
         } catch (FileNotFoundException e) {
             System.err.println("Error al cargar el archivo de empleados: " + e.getMessage());
         } catch (NumberFormatException e) {
-            System.err.println("Error al parsear un numero en el archivo de empleados: " + e.getMessage());
+            System.err.println("Error al leer un numero en el archivo de empleados: " + e.getMessage());
         }
     }
 
