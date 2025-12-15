@@ -1,0 +1,351 @@
+classDiagram
+    %% Clase Base
+    class Persona {
+        <<abstract>>
+        -int id
+        -String nombre
+        -int documento
+        -String correo
+        +getId() int
+        +setId(int) void
+        +getNombre() String
+        +setNombre(String) void
+        +getDocumento() int
+        +setDocumento(int) void
+        +getCorreo() String
+        +setCorreo(String) void
+        +getTipoPersona()* String
+    }
+
+    %% Clases de Dominio
+    class Cliente {
+        -String telefono
+        +getTelefono() String
+        +setTelefono(String) void
+        +getTipoPersona() String
+        +toString() String
+    }
+
+    class Empleado {
+        -String rol
+        -double salario
+        +getRol() String
+        +setRol(String) void
+        +getSalario() double
+        +setSalario(double) void
+        +getTipoPersona() String
+        +toString() String
+    }
+
+    class Prestamos {
+        -int id
+        -int clienteId
+        -int empleadoId
+        -double monto
+        -double interesMensual
+        -int cuotas
+        -String fechaInicio
+        -String estado
+        -double saldoPendiente
+        -double montoTotal
+        -double cuotaMensual
+        +calcularValoresPrestamo() void
+        +getId() int
+        +getClienteId() int
+        +getEmpleadoId() int
+        +getMonto() double
+        +getInteresMensual() double
+        +getCuotas() int
+        +getFechaInicio() String
+        +getEstado() String
+        +getSaldoPendiente() double
+        +getMontoTotal() double
+        +getCuotaMensual() double
+        +toString() String
+    }
+
+    class Pagos {
+        -int id
+        -int prestamoId
+        -double monto
+        -String fecha
+        +getId() int
+        +getPrestamoId() int
+        +getMonto() double
+        +getFecha() String
+        +toString() String
+    }
+
+    %% Interfaces Repository
+    class ClienteRepository {
+        <<interface>>
+        +agregar(Cliente) Cliente
+        +listar() List~Cliente~
+        +obtenerPorDocumento(int) Cliente
+        +actualizar(Cliente) void
+        +eliminar(int) void
+    }
+
+    class EmpleadoRepository {
+        <<interface>>
+        +agregar(Empleado) Empleado
+        +listar() List~Empleado~
+        +obtenerPorId(int) Empleado
+        +actualizar(Empleado) void
+        +eliminar(int) void
+    }
+
+    class PrestamoRepository {
+        <<interface>>
+        +agregar(Prestamos) Prestamos
+        +listar() List~Prestamos~
+        +obtenerPorId(int) Prestamos
+        +obtenerPorClienteId(int) List~Prestamos~
+        +cambiarEstado(int, String) void
+        +actualizarSaldo(int, double) void
+    }
+
+    class PagosRepository {
+        <<interface>>
+        +registrar(Pagos) Pagos
+        +listarPorPrestamo(int) List~Pagos~
+        +registrarPagoConActualizacionSaldo(Pagos, double, int) Pagos
+    }
+
+    %% Implementaciones JDBC
+    class ClienteRepositoryJdbc {
+        -DatabaseConnection dbConnection
+        -inicializarEsquema() void
+        -getConnection() Connection
+        +agregar(Cliente) Cliente
+        +listar() List~Cliente~
+        +obtenerPorDocumento(int) Cliente
+        +actualizar(Cliente) void
+        +eliminar(int) void
+    }
+
+    class EmpleadoRepositoryJdbc {
+        -DatabaseConnection dbConnection
+        -inicializarEsquema() void
+        -getConnection() Connection
+        +agregar(Empleado) Empleado
+        +listar() List~Empleado~
+        +obtenerPorId(int) Empleado
+        +actualizar(Empleado) void
+        +eliminar(int) void
+    }
+
+    class PrestamoRepositoryJdbc {
+        -DatabaseConnection dbConnection
+        -inicializarEsquema() void
+        -getConnection() Connection
+        +agregar(Prestamos) Prestamos
+        +listar() List~Prestamos~
+        +obtenerPorId(int) Prestamos
+        +obtenerPorClienteId(int) List~Prestamos~
+        +cambiarEstado(int, String) void
+        +actualizarSaldo(int, double) void
+    }
+
+    class PagosRepositoryJdbc {
+        -DatabaseConnection dbConnection
+        -inicializarEsquema() void
+        +registrar(Pagos) Pagos
+        +listarPorPrestamo(int) List~Pagos~
+        +registrarPagoConActualizacionSaldo(Pagos, double, int) Pagos
+    }
+
+    %% Implementaciones Archivo
+    class ClienteRepositoryArchivo {
+        -String RUTA_ARCHIVO
+        -List~Cliente~ clientes
+        -int proximoId
+        -calcularProximoId() int
+        -cargar() void
+        -guardar() void
+        +agregar(Cliente) Cliente
+        +listar() List~Cliente~
+        +obtenerPorDocumento(int) Cliente
+        +actualizar(Cliente) void
+        +eliminar(int) void
+    }
+
+    class EmpleadoRepositoryArchivo {
+        -String RUTA_ARCHIVO
+        -List~Empleado~ empleados
+        -int proximoId
+        -calcularProximoId() int
+        -cargar() void
+        -guardar() void
+        +agregar(Empleado) Empleado
+        +listar() List~Empleado~
+        +obtenerPorId(int) Empleado
+        +actualizar(Empleado) void
+        +eliminar(int) void
+    }
+
+    class PrestamoRepositoryArchivo {
+        -String RUTA_ARCHIVO
+        -List~Prestamos~ prestamos
+        -int proximoId
+        -calcularProximoId() int
+        -cargar() void
+        -guardar() void
+        +agregar(Prestamos) Prestamos
+        +listar() List~Prestamos~
+        +obtenerPorId(int) Prestamos
+        +obtenerPorClienteId(int) List~Prestamos~
+        +cambiarEstado(int, String) void
+        +actualizarSaldo(int, double) void
+    }
+
+    class PagosRepositoryArchivo {
+        -String RUTA_ARCHIVO
+        -List~Pagos~ pagos
+        -int proximoId
+        -calcularProximoId() int
+        -cargar() void
+        -guardar() void
+        +registrar(Pagos) Pagos
+        +listarPorPrestamo(int) List~Pagos~
+        +registrarPagoConActualizacionSaldo(Pagos, double, int) Pagos
+    }
+
+    %% Clases de Menú
+    class MenuClientes {
+        -ClienteRepository clienteRepository
+        -PrestamoRepository prestamoRepository
+        -Scanner consola
+        +iniciarMenu() void
+        -mcAgregarCliente() void
+        -mcListarClientes() void
+        -mcBuscarCliente() void
+        -mcEliminarCliente() void
+        -mcActualizarCliente() void
+        -mcConsultarPrestamos() void
+    }
+
+    class MenuEmpleados {
+        -EmpleadoRepository empleadoRepository
+        -Scanner consola
+        +iniciarMenu() void
+        -meAgregarEmpleado() void
+        -meListarEmpleados() void
+        -meBuscarEmpleado() void
+        -meEliminarEmpleado() void
+        -meActualizarEmpleado() void
+    }
+
+    class MenuPrestamos {
+        -PrestamoRepository prestamoRepository
+        -ClienteRepository clienteRepository
+        -EmpleadoRepository empleadoRepository
+        -Scanner consola
+        +iniciarMenu() void
+        -mpAgregarPrestamo() void
+        -mpListarPrestamos() void
+        -mpCambiarEstado() void
+    }
+
+    class MenuPagos {
+        -PagosRepository pagosRepository
+        -PrestamoRepository prestamoRepository
+        -Scanner consola
+        +iniciarMenu() void
+        -registrarPago() void
+        -listarPagos() void
+        -generarReportePorPrestamo() void
+        -generarReporteGeneral() void
+    }
+
+    class MenuReportes {
+        -PrestamoRepository prestamoRepository
+        -ClienteRepository clienteRepository
+        -Scanner consola
+        +iniciarMenu() void
+        -mrListarPrestamosActivos() void
+        -mrListarPrestamosVencidos() void
+        -mrListarClientesMorosos() void
+    }
+
+    %% Clases Utilitarias
+    class ReporteManager {
+        <<utility>>
+        +filtrarPrestamosActivos(List~Prestamos~) List~Prestamos~
+        +filtrarPrestamosVencidos(List~Prestamos~) List~Prestamos~
+        +filtrarClientesMorosos(List~Cliente~, List~Prestamos~) List~Cliente~
+        +calcularTotalPagos(List~Pagos~) double
+        +filtrarPrestamosPorEstado(List~Prestamos~, String) List~Prestamos~
+    }
+
+    class ReportePagos {
+        <<utility>>
+        -String RUTA_REPORTES
+        +generarReportePorPrestamo(int, PagosRepository, PrestamoRepository) String
+        +generarReporteGeneral(PagosRepository, PrestamoRepository) String
+    }
+
+    class DatabaseConnection {
+        -String URL
+        -String USER
+        -String PASSWORD
+        -Connection connection
+        +getConnection() Connection
+        +close() void
+    }
+
+    class App {
+        -Scanner scanner
+        -boolean USAR_JDBC
+        +main(String[]) void
+    }
+
+    %% Relaciones de Herencia
+    Persona <|-- Cliente
+    Persona <|-- Empleado
+
+    %% Relaciones de Implementación (Repository Pattern)
+    ClienteRepository <|.. ClienteRepositoryJdbc
+    ClienteRepository <|.. ClienteRepositoryArchivo
+    EmpleadoRepository <|.. EmpleadoRepositoryJdbc
+    EmpleadoRepository <|.. EmpleadoRepositoryArchivo
+    PrestamoRepository <|.. PrestamoRepositoryJdbc
+    PrestamoRepository <|.. PrestamoRepositoryArchivo
+    PagosRepository <|.. PagosRepositoryJdbc
+    PagosRepository <|.. PagosRepositoryArchivo
+
+    %% Dependencias de Menús
+    MenuClientes --> ClienteRepository
+    MenuClientes --> PrestamoRepository
+    MenuEmpleados --> EmpleadoRepository
+    MenuPrestamos --> PrestamoRepository
+    MenuPrestamos --> ClienteRepository
+    MenuPrestamos --> EmpleadoRepository
+    MenuPagos --> PagosRepository
+    MenuPagos --> PrestamoRepository
+    MenuReportes --> PrestamoRepository
+    MenuReportes --> ClienteRepository
+
+    %% Dependencias de JDBC Repositories
+    ClienteRepositoryJdbc --> DatabaseConnection
+    EmpleadoRepositoryJdbc --> DatabaseConnection
+    PrestamoRepositoryJdbc --> DatabaseConnection
+    PagosRepositoryJdbc --> DatabaseConnection
+
+    %% Uso de modelos
+    ClienteRepository ..> Cliente
+    EmpleadoRepository ..> Empleado
+    PrestamoRepository ..> Prestamos
+    PagosRepository ..> Pagos
+
+    %% App principal
+    App --> MenuClientes
+    App --> MenuEmpleados
+    App --> MenuPrestamos
+    App --> MenuPagos
+    App --> MenuReportes
+    App --> ClienteRepository
+    App --> EmpleadoRepository
+    App --> PrestamoRepository
+    App --> PagosRepository
+    App --> DatabaseConnection
