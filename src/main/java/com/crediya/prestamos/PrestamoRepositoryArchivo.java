@@ -27,7 +27,7 @@ public class PrestamoRepositoryArchivo implements PrestamoRepository {
     }
 
     @Override
-    public Prestamos agregar(Prestamos prestamo) {
+    public Prestamos registrarPrestamo(Prestamos prestamo) {
         prestamo.setId(proximoId++);
 
         prestamo.calcularValoresPrestamo();
@@ -37,7 +37,7 @@ public class PrestamoRepositoryArchivo implements PrestamoRepository {
     }
 
     @Override
-    public List<Prestamos> listar() {
+    public List<Prestamos> listarPrestamos() {
         return new ArrayList<>(prestamos);
     }
 
@@ -88,11 +88,12 @@ public class PrestamoRepositoryArchivo implements PrestamoRepository {
                             Integer.parseInt(p[0]),
                             Integer.parseInt(p[1]),
                             Integer.parseInt(p[2]),
-                            Double.parseDouble(p[3]),
+                            Integer.parseInt(p[3]),
                             Double.parseDouble(p[4]),
-                            Integer.parseInt(p[5]),
-                            p[6],
-                            p[7]);
+                            Double.parseDouble(p[5]),
+                            Integer.parseInt(p[6]),
+                            p[7],
+                            p[8]);
 
                     if (p.length == 9) {
                         prestamo.setSaldoPendiente(Double.parseDouble(p[8]));

@@ -47,7 +47,7 @@ public class PrestamoRepositoryJdbc implements PrestamoRepository {
     }
 
     @Override
-    public Prestamos agregar(Prestamos prestamo) {
+    public Prestamos registrarPrestamo(Prestamos prestamo) {
         String sql = "INSERT INTO prestamos(cliente_id, empleado_id, monto, interes, cuotas, fecha_inicio, estado, saldo_pendiente) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -74,13 +74,13 @@ public class PrestamoRepositoryJdbc implements PrestamoRepository {
 
             return prestamo;
         } catch (SQLException e) {
-            System.err.println("Error al agregar prestamo: " + e.getMessage());
+            System.err.println("Error al registrarPrestamo prestamo: " + e.getMessage());
             return null;
         }
     }
 
     @Override
-    public List<Prestamos> listar() {
+    public List<Prestamos> listarPrestamos() {
         List<Prestamos> prestamos = new ArrayList<>();
         String sql = "SELECT * FROM prestamos";
         try (Connection conn = getConnection();
@@ -91,7 +91,7 @@ public class PrestamoRepositoryJdbc implements PrestamoRepository {
                 prestamos.add(mapRowToPrestamo(rs));
             }
         } catch (SQLException e) {
-            System.err.println("Error al listar prestamos: " + e.getMessage());
+            System.err.println("Error al listarPrestamos : " + e.getMessage());
         }
         return prestamos;
     }
@@ -173,12 +173,13 @@ public class PrestamoRepositoryJdbc implements PrestamoRepository {
         return new Prestamos(
                 rs.getInt("id"),
                 rs.getInt("cliente_id"),
-                rs.getInt("empleado_id"),
                 rs.getBigDecimal("monto").doubleValue(),
+                rs.getInt("empleado_id"),
                 interesMensual,
+                rs.getInt("plazo_meses"),
+                rs.getString("estado"),
                 rs.getInt("cuotas"),
                 fechaInicio,
-                rs.getString("estado"),
                 saldoPendiente);
     }
 }

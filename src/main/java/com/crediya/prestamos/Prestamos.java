@@ -1,20 +1,23 @@
 package com.crediya.prestamos;
 
 public class Prestamos {
-    private int id;
-    private int clienteId;
+    //Examen
+    private int id; //---
+    private int clienteId; //---
+    private double monto;//---
+    private double interesMensual; //---
+    private int plazoMeses;  //---
+    private String estado;  //---
+    //----------------------------------//
     private int empleadoId;
-    private double monto;
-    private double interesMensual;
     private int cuotas;
     private String fechaInicio;
-    private String estado;
     private double saldoPendiente;
 
     private double montoTotal;
     private double cuotaMensual;
 
-    public Prestamos(int id, int clienteId, int empleadoId, double monto, double interesMensual, int cuotas,
+    public Prestamos(int id, int clienteId, int plazoMeses,int empleadoId, double monto, double interesMensual, int cuotas,
             String fechaInicio, String estado) {
         this.id = id;
         this.clienteId = clienteId;
@@ -24,14 +27,15 @@ public class Prestamos {
         this.cuotas = cuotas;
         this.fechaInicio = fechaInicio;
         this.estado = estado;
+        this.plazoMeses = plazoMeses;
 
         calcularValoresPrestamo();
         this.saldoPendiente = this.montoTotal;
     }
 
-    public Prestamos(int id, int clienteId, int empleadoId, double monto, double interesMensual, int cuotas,
+    public Prestamos(int id, int clienteId, int empleadoId, int plazoMeses, double monto, double interesMensual, int cuotas,
             String fechaInicio, String estado, double saldoPendiente) {
-        this(id, clienteId, empleadoId, monto, interesMensual, cuotas, fechaInicio, estado);
+        this(id, clienteId, empleadoId, plazoMeses, monto, interesMensual, cuotas, fechaInicio, estado);
         this.saldoPendiente = saldoPendiente;
     }
 
@@ -48,6 +52,32 @@ public class Prestamos {
         this.cuotaMensual = this.montoTotal / this.cuotas;
     }
 
+    // Examen
+    
+    public double calcularTotalAPagar(){
+        if (this.monto <= 0 || this.cuotas <= 0 || this.interesMensual < 0) {
+            throw new IllegalArgumentException(
+                "El monto y las cuotas deben ser mayores a 0, y el interes no puede ser negativo.");
+        }
+        
+        double interesTotal = this.monto * this.interesMensual * this.cuotas;
+        
+        this.montoTotal = this.monto + interesTotal;
+        
+        double totalAPagar = this.montoTotal * this.cuotas;
+
+        return totalAPagar;
+    }
+
+
+    public int getPlazoMeses() {
+        return plazoMeses;
+    }
+
+    public void setPlazoMeses(int plazoMeses) {
+        this.plazoMeses = plazoMeses;
+    }
+//-------------------------------------------------//
     public int getId() {
         return id;
     }
@@ -128,20 +158,23 @@ public class Prestamos {
         this.saldoPendiente = saldoPendiente;
     }
 
+    //Examen
     @Override
     public String toString() {
-        return "Prestamo{"
-                + "id=" + id + ", "
-                + "clienteId=" + clienteId + ", "
-                + "empleadoId=" + empleadoId + ", "
-                + "monto=" + monto + ", "
-                + "interesMensual=" + interesMensual + ", "
-                + "cuotas=" + cuotas + ", "
-                + "fechaInicio='" + fechaInicio + "'" + ", "
-                + "estado='" + estado + "'" + ", "
-                + "montoTotal=" + montoTotal + ", "
-                + "cuotaMensual=" + cuotaMensual + ", "
-                + "saldoPendiente=" + saldoPendiente + 
-                '}';
+        return   "Prestamos [id=" + id + 
+                 ", clienteId=" + clienteId +
+                 ", monto=" + monto + 
+                 ", interesMensual=" + interesMensual + 
+                 ", plazoMeses=" + plazoMeses + 
+                 ", estado=" + estado + 
+                 ", empleadoId=" + empleadoId + 
+                 ", cuotas=" + cuotas + 
+                 ", fechaInicio=" + fechaInicio + 
+                 ", saldoPendiente=" + saldoPendiente + 
+                 ", montoTotal=" + montoTotal + 
+                 ", cuotaMensual=" + cuotaMensual + 
+                 ", calcularTotalAPagar()=" + calcularTotalAPagar() + "]";
     }
+    //---------------------------------------------------------
+    
 }

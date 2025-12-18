@@ -82,7 +82,7 @@ public class ReportePagos {
     }
 
     public static String generarReporteGeneral(PagosRepository pagosRepository, PrestamoRepository prestamoRepository) {
-        List<Prestamos> prestamos = prestamoRepository.listar();
+        List<Prestamos> prestamos = prestamoRepository.listarPrestamos();
 
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         String nombreArchivo = "reporte_pagos_general_" + timestamp + ".txt";

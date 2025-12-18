@@ -3,9 +3,9 @@ package com.crediya.prestamos;
 import java.util.List;
 
 public interface PrestamoRepository {
-    Prestamos agregar(Prestamos prestamo);
+    Prestamos registrarPrestamo(Prestamos prestamo);
 
-    List<Prestamos> listar();
+    List<Prestamos> listarPrestamos();
 
     Prestamos obtenerPorId(int id);
     

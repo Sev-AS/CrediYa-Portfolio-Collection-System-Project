@@ -63,7 +63,7 @@ public class MenuReportes {
     private void mrListarPrestamosActivos() {
         System.out.println("Prestamos Activos");
         try {
-            List<Prestamos> todosLosPrestamos = prestamoRepository.listar();
+            List<Prestamos> todosLosPrestamos = prestamoRepository.listarPrestamos();
             List<Prestamos> prestamosActivos = ReporteManager.filtrarPrestamosActivos(todosLosPrestamos);
             
             if (prestamosActivos.isEmpty()) {
@@ -80,7 +80,7 @@ public class MenuReportes {
     private void mrListarPrestamosVencidos() {
         System.out.println("Prestamos Vencidos");
         try {
-            List<Prestamos> todosLosPrestamos = prestamoRepository.listar();
+            List<Prestamos> todosLosPrestamos = prestamoRepository.listarPrestamos();
             List<Prestamos> prestamosVencidos = ReporteManager.filtrarPrestamosVencidos(todosLosPrestamos);
             
             if (prestamosVencidos.isEmpty()) {
@@ -98,7 +98,7 @@ public class MenuReportes {
         System.out.println("Clientes Morosos");
         try {
             List<Cliente> todosLosClientes = clienteRepository.listar();
-            List<Prestamos> todosLosPrestamos = prestamoRepository.listar();
+            List<Prestamos> todosLosPrestamos = prestamoRepository.listarPrestamos();
             List<Cliente> clientesMorosos = ReporteManager.filtrarClientesMorosos(todosLosClientes, todosLosPrestamos);
             
             if (clientesMorosos.isEmpty()) {

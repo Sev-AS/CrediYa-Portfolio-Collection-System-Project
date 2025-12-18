@@ -43,7 +43,7 @@ public class MenuPrestamos {
                 consola.nextLine();
 
                 switch (opcion) {
-                    case 1 -> mpAgregarPrestamo();
+                    case 1 -> mpregistrarPrestamoPrestamo();
                     case 2 -> mpListarPrestamos();
                     case 3 -> mpCambiarEstado();
                     case 4 -> System.out.println("Saliendo del menu de prestamos...");
@@ -57,7 +57,7 @@ public class MenuPrestamos {
         } while (opcion != 4);
     }
 
-    private void mpAgregarPrestamo() {
+    private void mpregistrarPrestamoPrestamo() {
         System.out.println("Registrar Nuevo Prestamo");
         try {
             System.out.print("Documento del Cliente: ");
@@ -115,7 +115,7 @@ public class MenuPrestamos {
             String estado = consola.nextLine();
 
             Prestamos nuevo = new Prestamos(0, clienteId, empleadoId, monto, interes, cuotas, fecha, estado);
-            Prestamos prestamoGuardado = prestamoRepository.agregar(nuevo);
+            Prestamos prestamoGuardado = prestamoRepository.registrarPrestamo(nuevo);
 
             if (prestamoGuardado != null) {
                 System.out.println("Prestamo registrado exitosamente con ID: " + prestamoGuardado.getId());
@@ -133,7 +133,7 @@ public class MenuPrestamos {
 
     private void mpListarPrestamos() {
         System.out.println("Lista de Prestamos");
-        List<Prestamos> prestamos = prestamoRepository.listar();
+        List<Prestamos> prestamos = prestamoRepository.listarPrestamos();
         if (prestamos.isEmpty()) {
             System.out.println("No hay prestamos registrados.");
         } else {
